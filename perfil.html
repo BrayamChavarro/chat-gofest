@@ -1,0 +1,3702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3dE Chat</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+    <meta name="theme-color" content="#FF8A00">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: black; /* bg-gray-900 */
+            color: #f9fafb; /* text-gray-50 */
+        }
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #000000; /* bg-gray-900 */ }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; /* bg-gray-600 */ }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; /* bg-gray-500 */ }
+        /* Hero Section Animations */
+        @keyframes fade-in-down {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Nueva animación de movimiento para cada letra */
+        @keyframes letter-rise {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+                filter: blur(8px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        .animate-letter-rise {
+            display: inline-block; /* Necesario para aplicar transform */
+            opacity: 0; /* Inicia oculto */
+            animation: letter-rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            color: #ffffff; /* Blanco sólido */
+        }
+
+        .animate-fade-in-up {
+            animation: fade-in-up 0.8s ease-out forwards;
+            opacity: 0; /* Inicia transparente para que la animación funcione */
+        }
+        /* Sidebar styles */
+        #sidebar.collapsed {
+            width: 0;
+        }
+        
+        #sidebar.collapsed .nav-text { 
+            display: none; 
+        }
+
+        /* Mobile sidebar overlay */
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 50;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                width: 280px;
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(10px);
+            }
+            
+            #sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            #sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+            
+            /* Mobile overlay backdrop */
+            .mobile-sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s ease-in-out;
+            }
+            
+            .mobile-sidebar-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+        
+        /* Chat list item styles */
+        .chat-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            color: #e5e7eb;
+        }
+        
+        .chat-list-item:hover {
+            background-color: rgba(55, 65, 81, 0.5);
+        }
+        
+        .chat-list-item.selected {
+            background-color: rgb(55, 65, 81);
+        }
+        
+        .chat-list-item .chat-content {
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .chat-list-item .chat-title-container {
+            margin-left: 0.75rem;
+            overflow: hidden;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .chat-list-item .chat-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+        
+        .chat-list-item .chat-preview {
+            margin-top: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            opacity: 0.7;
+        }
+
+        /* Mobile chat list improvements */
+        @media (max-width: 768px) {
+            .chat-list-item {
+                padding: 0.75rem;
+                min-height: 60px;
+            }
+            
+            .chat-list-item .chat-actions {
+                gap: 0.5rem;
+            }
+            
+            .chat-actions button {
+                padding: 0.5rem;
+                min-width: 40px;
+                min-height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .chat-list-item .chat-title {
+                font-size: 0.95rem;
+                font-weight: 500;
+            }
+            
+            .chat-list-item .chat-preview {
+                font-size: 0.8rem;
+                margin-top: 4px;
+            }
+            
+            /* New chat button mobile */
+            #new-chat-btn {
+                padding: 0.875rem;
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            /* Chat section title mobile */
+            .chat-section-title {
+                padding: 0 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+        }
+        
+        .chat-list-item .chat-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .chat-list-item:hover .chat-actions {
+            opacity: 1;
+        }
+        
+        .chat-actions button {
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            transition: colors 0.2s;
+        }
+        
+        .chat-actions button:hover {
+            background-color: rgba(75, 85, 99, 0.5);
+        }
+        
+        .chat-actions .delete-btn:hover {
+            color: #ef4444;
+        }
+        
+        /* Tone buttons */
+        .tone-btn.selected {
+            background-color: #dc2626;
+            color: white;
+        }
+        
+        /* Message styles */
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            max-width: 85%;
+            margin: 0 auto 1rem auto;
+            width: 100%;
+        }
+
+        /* Mobile message styles */
+        @media (max-width: 768px) {
+            .message {
+                max-width: 95%;
+                gap: 0.5rem;
+                margin: 0 auto 0.75rem auto;
+            }
+            
+            .message.user {
+                margin-left: auto;
+                margin-right: 0.5rem;
+            }
+            
+            .message:not(.user) {
+                margin-left: 0.5rem;
+                margin-right: auto;
+            }
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+            justify-content: flex-start;
+            margin-left: auto;
+            margin-right: 1rem;
+        }
+        
+        .message:not(.user) {
+            justify-content: flex-start;
+            margin-left: 1rem;
+            margin-right: auto;
+        }
+        
+        .message-avatar {
+            flex-shrink: 0;
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .message-avatar.ai {
+            background-color: #dc2626;
+        }
+        
+        .message-avatar.user {
+            background-color: rgb(55, 65, 81);
+        }
+        
+        .message-content {
+            padding: 0.875rem;
+            border-radius: 0.75rem;
+            max-width: 75%;
+            word-wrap: break-word;
+            min-width: fit-content;
+        }
+
+        /* Mobile content adjustments */
+        @media (max-width: 768px) {
+            .message-content {
+                padding: 0.75rem;
+                max-width: 85%;
+                font-size: 0.95rem;
+                line-height: 1.4;
+            }
+            
+            .message-avatar {
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+            
+            .message-avatar svg {
+                width: 0.875rem;
+                height: 0.875rem;
+            }
+        }
+        
+        .message-content.ai {
+            background-color: rgb(55, 65, 81);
+            color: white;
+            border-bottom-left-radius: 0.25rem;
+        }
+        
+        .message-content.user {
+            background-color: #ac1e1e38;
+            color: white;
+            border-bottom-right-radius: 0.25rem;
+        }
+        
+        .message-text {
+            white-space: pre-wrap;
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        /* Chat input centering */
+        #chat-input {
+            line-height: 1.5;
+            min-height: 44px;
+            font-size: 1rem;
+        }
+
+        /* Mobile responsive adjustments - Layout lateral */
+        @media (max-width: 768px) {
+            #main-content {
+                width: 100%;
+                margin-left: 0;
+            }
+            
+            /* En móvil, mantener layout vertical */
+            .flex:has(#video-container) {
+                flex-direction: column !important;
+            }
+            
+            #chat-container {
+                width: 100% !important;
+                height: 30vh !important;
+                min-height: 200px;
+                border-left: none !important;
+                border-top: 1px solid rgba(59, 130, 246, 0.3) !important;
+                box-shadow: 0 -8px 20px -5px rgba(0, 0, 0, 0.5) !important;
+                min-width: auto !important;
+                max-width: none !important;
+                padding: 0.75rem;
+            }
+            
+            /* Ajustar posición del botón de scroll en móviles */
+            #scroll-to-bottom {
+                bottom: 12rem !important;
+                right: 1rem !important;
+            }
+            
+            #video-container {
+                flex: 1;
+                min-height: 0;
+            }
+            
+            #video-container video {
+                max-width: 100%;
+                height: auto;
+            }
+            
+            #chat-input-container {
+                padding: 0.5rem;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 30;
+                background: rgba(0, 0, 0, 0.98);
+                backdrop-filter: blur(10px);
+            }
+            
+            #chat-input-container .max-w-3xl {
+                max-width: 100%;
+                padding: 0 0.25rem;
+            }
+            
+            #chat-input {
+                min-height: 32px;
+                font-size: 0.9rem;
+            }
+            
+            /* Ajustar área de mensajes para móvil */
+            #messages {
+                margin-bottom: 60px; /* Espacio para el input fijo más pequeño */
+                padding: 0.75rem;
+            }
+            
+                         .tone-btn {
+                 padding: 0.5rem 0.75rem;
+                 font-size: 0.8rem;
+                 min-height: 36px;
+                 min-width: 60px;
+             }
+             
+             /* Estilos mejorados para recomendaciones con blur */
+             #message-recommendations {
+                 backdrop-filter: blur(10px);
+                 background: rgba(17, 24, 39, 0.8);
+                 border-top: 1px solid rgba(75, 85, 99, 0.3);
+                 animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+             }
+             
+             .recommendation-btn {
+                 background: rgba(55, 65, 81, 0.7);
+                 backdrop-filter: blur(8px);
+                 border: 1px solid rgba(75, 85, 99, 0.4);
+                 color: #e5e7eb;
+                 transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                 white-space: nowrap;
+                 text-overflow: ellipsis;
+                 overflow: hidden;
+                 max-width: 280px;
+                 position: relative;
+             }
+             
+             .recommendation-btn::before {
+                 content: '';
+                 position: absolute;
+                 top: 0;
+                 left: 0;
+                 right: 0;
+                 bottom: 0;
+                 background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(239, 68, 68, 0.1));
+                 opacity: 0;
+                 transition: opacity 0.3s ease;
+                 border-radius: inherit;
+             }
+             
+             .recommendation-btn:hover::before {
+                 opacity: 1;
+             }
+             
+             .recommendation-btn:hover {
+                 transform: translateY(-2px) scale(1.02);
+                 box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+                 background: rgba(75, 85, 99, 0.8);
+                 border-color: rgba(249, 115, 22, 0.5);
+                 color: #f97316;
+             }
+             
+             .recommendation-btn:active {
+                 transform: translateY(0) scale(0.98);
+                 transition: all 0.1s ease;
+             }
+             
+             #refresh-recommendations {
+                 backdrop-filter: blur(4px);
+                 background: rgba(249, 115, 22, 0.1);
+                 border: 1px solid rgba(249, 115, 22, 0.3);
+                 border-radius: 6px;
+                 padding: 4px 8px;
+                 transition: all 0.3s ease;
+             }
+             
+             #refresh-recommendations:hover {
+                 background: rgba(249, 115, 22, 0.2);
+                 border-color: rgba(249, 115, 22, 0.5);
+                 transform: scale(1.05);
+             }
+             
+             @keyframes slideUp {
+                 from {
+                     opacity: 0;
+                     transform: translateY(20px);
+                     backdrop-filter: blur(0px);
+                 }
+                 to {
+                     opacity: 1;
+                     transform: translateY(0);
+                     backdrop-filter: blur(10px);
+                 }
+             }
+             
+             /* Mejoras visuales adicionales con blur */
+             #chat-input-container {
+                 backdrop-filter: blur(12px);
+                 background: rgba(0, 0, 0, 0.8);
+                 border-top: 1px solid rgba(75, 85, 99, 0.3);
+             }
+             
+             #chat-input-container .bg-gray-800 {
+                 background: rgba(31, 41, 55, 0.7);
+                 backdrop-filter: blur(8px);
+                 border: 1px solid rgba(75, 85, 99, 0.4);
+             }
+             
+             .message {
+                 backdrop-filter: blur(4px);
+                 transition: all 0.3s ease;
+             }
+             
+             .message:hover {
+                 transform: translateY(-1px);
+                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+             }
+             
+             /* Efectos de glassmorphism para el chat */
+             #chat-container {
+                 background: rgba(17, 24, 39, 0.1);
+                 backdrop-filter: blur(2px);
+             }
+             
+             /* Mejoras para el botón de envío */
+             button[type="submit"]:hover {
+                 transform: scale(1.05);
+                 box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+             }
+             
+             button[type="submit"]:active {
+                 transform: scale(0.95);
+             }
+             
+             /* Submit button mobile */
+             button[type="submit"] {
+                 min-width: 44px;
+                 min-height: 44px;
+                 padding: 0.75rem;
+             }
+            
+            /* Welcome screen mobile */
+            #welcome-screen {
+                padding: 1rem;
+            }
+            
+            #welcome-screen h1 {
+                font-size: 2.5rem !important;
+            }
+            
+            #welcome-screen p {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+            
+            .w-full.max-w-3xl {
+                padding: 0 1rem;
+            }
+            
+            /* Header mobile */
+            header {
+                padding: 0.75rem 1rem;
+            }
+            
+            #chat-title {
+                font-size: 1rem;
+                max-width: 200px;
+                                 overflow: hidden;
+                 text-overflow: ellipsis;
+                 white-space: nowrap;
+             }
+             
+             /* Prevent horizontal scroll on mobile */
+             body {
+                 overflow-x: hidden;
+             }
+             
+             /* Touch improvements */
+             .chat-list-item, 
+             #new-chat-btn,
+             .chat-actions button,
+             #sidebar-toggle {
+                 -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+                 touch-action: manipulation;
+             }
+         }
+         
+         /* Enhanced AI response formatting */
+         .message-content.ai {
+             line-height: 1.6;
+         }
+         
+         .message-content.ai h1,
+         .message-content.ai h2,
+         .message-content.ai h3 {
+             line-height: 1.3;
+             font-weight: 700;
+         }
+         
+         .message-content.ai h1 {
+             color: #FED7AA;
+             border-bottom: 2px solid #FF8A00;
+             padding-bottom: 0.5rem;
+         }
+         
+         .message-content.ai h2 {
+             color: #FDBA74;
+             border-bottom: 1px solid rgba(255, 138, 0, 0.3);
+             padding-bottom: 0.5rem;
+         }
+         
+         .message-content.ai h3 {
+             color: #FB923C;
+         }
+         
+         .message-content.ai hr {
+             border-color: #4B5563;
+             margin: 1.5rem 0;
+         }
+         
+         .message-content.ai blockquote {
+             background: rgba(31, 41, 55, 0.5);
+             border-left: 4px solid #FF8A00;
+             padding: 0.75rem 1rem;
+             margin: 1rem 0;
+             border-radius: 0 0.5rem 0.5rem 0;
+             font-style: italic;
+         }
+         
+         .message-content.ai code {
+             background: #374151;
+             color: #FB923C;
+             padding: 0.25rem 0.5rem;
+             border-radius: 0.25rem;
+             font-family: 'SF Mono', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+             font-size: 0.875em;
+         }
+         
+         .message-content.ai pre {
+             background: #1F2937;
+             border: 1px solid #374151;
+             border-radius: 0.5rem;
+             padding: 1rem;
+             margin: 1rem 0;
+             overflow-x: auto;
+         }
+         
+         .message-content.ai pre code {
+             background: none;
+             color: #E5E7EB;
+             padding: 0;
+         }
+         
+         /* List improvements */
+         .message-content.ai ul {
+             margin: 0.5rem 0;
+             padding-left: 1rem;
+         }
+         
+         .message-content.ai li {
+             margin: 0.25rem 0;
+             color: #D1D5DB;
+         }
+         
+         /* Emoji spacing */
+         .message-content.ai h1:first-child,
+         .message-content.ai h2:first-child,
+         .message-content.ai h3:first-child {
+             margin-top: 0;
+         }
+         
+         /* Progress indicators */
+         .message-content.ai strong {
+             color: #FFFFFF;
+             font-weight: 600;
+         }
+         
+                   .message-content.ai em {
+              color: #D1D5DB;
+              font-style: italic;
+          }
+          
+          /* Estilos del Modal de Eliminación */
+          .delete-modal-overlay {
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: rgba(0, 0, 0, 0.75);
+              backdrop-filter: blur(4px);
+              z-index: 1000;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 1rem;
+              opacity: 0;
+              transition: opacity 0.3s ease-in-out;
+          }
+          
+          .delete-modal-overlay.show {
+              opacity: 1;
+          }
+          
+          .delete-modal-container {
+              width: 100%;
+              max-width: 400px;
+              transform: scale(0.9) translateY(20px);
+              transition: transform 0.3s ease-in-out;
+          }
+          
+          .delete-modal-overlay.show .delete-modal-container {
+              transform: scale(1) translateY(0);
+          }
+          
+          .delete-modal-content {
+              background: linear-gradient(145deg, #1f2937, #111827);
+              border: 1px solid #374151;
+              border-radius: 1rem;
+              padding: 2rem;
+              box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                          0 0 0 1px rgba(255, 138, 0, 0.1);
+              text-align: center;
+          }
+          
+          .delete-modal-icon {
+              margin-bottom: 1.5rem;
+              animation: pulse-warning 2s infinite;
+          }
+          
+          @keyframes pulse-warning {
+              0%, 100% { 
+                  transform: scale(1);
+                  opacity: 1;
+              }
+              50% { 
+                  transform: scale(1.05);
+                  opacity: 0.8;
+              }
+          }
+          
+          .delete-modal-title {
+              font-size: 1.5rem;
+              font-weight: 700;
+              color: #FFFFFF;
+              margin-bottom: 1rem;
+          }
+          
+          .delete-modal-message {
+              color: #D1D5DB;
+              margin-bottom: 1.5rem;
+              line-height: 1.6;
+          }
+          
+          .delete-modal-details {
+              background: rgba(31, 41, 55, 0.5);
+              border: 1px solid #374151;
+              border-radius: 0.5rem;
+              padding: 1rem;
+              margin-bottom: 2rem;
+          }
+          
+          .chat-info {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 0.5rem;
+              font-size: 0.875rem;
+          }
+          
+          .delete-modal-buttons {
+              display: flex;
+              gap: 1rem;
+              justify-content: center;
+          }
+          
+          .delete-btn-cancel,
+          .delete-btn-confirm {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 0.75rem 1.5rem;
+              border-radius: 0.5rem;
+              font-weight: 600;
+              font-size: 0.875rem;
+              transition: all 0.2s ease;
+              cursor: pointer;
+              border: none;
+              min-height: 44px;
+              min-width: 100px;
+          }
+          
+          .delete-btn-cancel {
+              background: #374151;
+              color: #E5E7EB;
+              border: 1px solid #4B5563;
+          }
+          
+          .delete-btn-cancel:hover {
+              background: #4B5563;
+              border-color: #6B7280;
+              transform: translateY(-1px);
+          }
+          
+          .delete-btn-confirm {
+              background: linear-gradient(135deg, #EF4444, #DC2626);
+              color: #FFFFFF;
+              border: 1px solid #DC2626;
+              box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39);
+          }
+          
+          .delete-btn-confirm:hover {
+              background: linear-gradient(135deg, #DC2626, #B91C1C);
+              transform: translateY(-1px);
+              box-shadow: 0 6px 20px 0 rgba(239, 68, 68, 0.5);
+          }
+          
+          .delete-btn-confirm:active {
+              transform: translateY(0);
+          }
+          
+          /* Mobile responsive del modal */
+          @media (max-width: 768px) {
+              .delete-modal-overlay {
+                  padding: 1rem;
+              }
+              
+              .delete-modal-content {
+                  padding: 1.5rem;
+              }
+              
+              .delete-modal-buttons {
+                  flex-direction: column;
+                  gap: 0.75rem;
+              }
+              
+              .delete-btn-cancel,
+              .delete-btn-confirm {
+                  width: 100%;
+                  min-height: 48px;
+              }
+          }
+          
+          /* Animación de loading */
+          @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+          }
+          
+          .animate-spin {
+              animation: spin 1s linear infinite;
+          }
+          
+          /* Estado disabled de botones */
+          .delete-btn-confirm:disabled {
+              opacity: 0.7;
+              cursor: not-allowed;
+              transform: none !important;
+          }
+          
+          .delete-btn-confirm:disabled:hover {
+              transform: none !important;
+              box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39) !important;
+          }
+
+          /* Optimizaciones para layout vertical */
+          #video-container {
+              background: rgba(0, 0, 0, 1);
+              border-radius: 0.75rem;
+              box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+              overflow: hidden;
+              min-height: 65vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+          }
+          
+          #video-container video {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              border-radius: 0.75rem;
+              box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+          }
+          
+          /* Chat container optimizado para posición lateral derecha */
+          #chat-container {
+              background: rgba(0, 0, 0, 1);
+              backdrop-filter: blur(15px);
+              border-left: 1px solid rgba(59, 130, 246, 0.3);
+              box-shadow: -8px 0 20px -5px rgba(0, 0, 0, 0.5);
+              overflow-y: auto;
+              overflow-x: hidden;
+              min-width: 320px;
+              max-width: 400px;
+              /* Asegurar que el scroll funcione correctamente */
+              height: 100%;
+              max-height: 100vh;
+          }
+          
+          /* Área de mensajes dentro del chat container - para layout lateral */
+          #messages {
+              overflow-y: auto;
+              height: 100%;
+              padding: 1rem;
+              scrollbar-width: thin;
+              scrollbar-color: rgba(59, 130, 246, 0.5) transparent;
+          }
+          
+          /* Estilos personalizados para el scrollbar del chat */
+          #chat-container::-webkit-scrollbar {
+              width: 8px;
+          }
+          
+          #chat-container::-webkit-scrollbar-track {
+              background: rgba(0, 0, 0, 0.2);
+              border-radius: 4px;
+          }
+          
+          #chat-container::-webkit-scrollbar-thumb {
+              background: rgba(59, 130, 246, 0.4);
+              border-radius: 4px;
+              transition: background 0.3s ease;
+          }
+          
+          #chat-container::-webkit-scrollbar-thumb:hover {
+              background: rgba(59, 130, 246, 0.6);
+          }
+          
+          /* Indicador visual sutil cuando hay más contenido arriba */
+          #chat-container::before {
+              content: '';
+              position: sticky;
+              top: 0;
+              left: 0;
+              right: 0;
+              height: 20px;
+              background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+              z-index: 10;
+              pointer-events: none;
+              opacity: 0;
+              transition: opacity 0.3s ease;
+          }
+          
+          #chat-container.has-scroll-content::before {
+              opacity: 1;
+          }
+          
+          /* Estilos para el scrollbar en Firefox */
+          #chat-container {
+              scrollbar-width: thin;
+              scrollbar-color: rgba(59, 130, 246, 0.4) transparent;
+          }
+          
+          /* Mejorar la experiencia táctil en móviles */
+          #chat-container {
+              -webkit-overflow-scrolling: touch;
+              overscroll-behavior: contain;
+          }
+          
+          /* Botón de scroll hacia abajo */
+          #scroll-to-bottom {
+              transition: opacity 0.3s ease, transform 0.3s ease;
+          }
+          
+          #scroll-to-bottom:hover {
+              transform: scale(1.1);
+          }
+          
+          #scroll-to-bottom.hidden {
+              opacity: 0;
+              pointer-events: none;
+          }
+          
+          #messages::-webkit-scrollbar {
+              width: 4px;
+          }
+          
+          #messages::-webkit-scrollbar-track {
+              background: transparent;
+          }
+          
+          #messages::-webkit-scrollbar-thumb {
+              background: rgba(59, 130, 246, 0.5);
+              border-radius: 2px;
+          }
+
+          /* Mensajes ajustados para layout lateral */
+          .message-content {
+              padding: 0.75rem;
+              border-radius: 0.75rem;
+              max-width: 90%;
+              word-wrap: break-word;
+              font-size: 0.9rem;
+              line-height: 1.4;
+          }
+
+          /* Ocultar scrollbar en sugerencias */
+          .scrollbar-hide {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
+          }
+          
+          .scrollbar-hide::-webkit-scrollbar {
+              display: none;
+          }
+
+          /* Botones de sugerencias en una sola línea */
+          #recommendation-buttons {
+              white-space: nowrap;
+              /* Asegurar que use todo el ancho disponible */
+              width: 100%;
+              /* Mejorar el scroll horizontal en móviles */
+              -webkit-overflow-scrolling: touch;
+              scrollbar-width: thin;
+              scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+          }
+          
+          /* Scrollbar para el contenedor de recomendaciones en webkit */
+          #recommendation-buttons::-webkit-scrollbar {
+              height: 4px;
+          }
+          
+          #recommendation-buttons::-webkit-scrollbar-track {
+              background: rgba(0, 0, 0, 0.2);
+              border-radius: 2px;
+          }
+          
+          #recommendation-buttons::-webkit-scrollbar-thumb {
+              background: rgba(59, 130, 246, 0.3);
+              border-radius: 2px;
+          }
+          
+          #recommendation-buttons::-webkit-scrollbar-thumb:hover {
+              background: rgba(59, 130, 246, 0.5);
+          }
+          
+          #recommendation-buttons button {
+              flex-shrink: 0;
+              white-space: nowrap;
+              /* Agregar padding más generoso para evitar recortes */
+              padding: 8px 16px !important;
+              min-width: fit-content;
+              /* Asegurar que el texto no se corte */
+              overflow: visible;
+              text-overflow: initial;
+              /* Fuente ligeramente más pequeña pero legible */
+              font-size: 0.75rem;
+              line-height: 1.2;
+              /* Asegurar que el contenido sea completamente visible */
+              max-width: none !important;
+          }
+
+          /* Estilos para el cuadro de videos disponibles */
+          #available-videos {
+              max-height: 200px;
+              overflow-y: auto;
+              scrollbar-width: thin;
+              scrollbar-color: #374151 #1f2937;
+          }
+          
+          /* Webkit scrollbar styling for available-videos */
+          #available-videos::-webkit-scrollbar {
+              width: 6px;
+          }
+          
+          #available-videos::-webkit-scrollbar-track {
+              background: #1f2937;
+              border-radius: 3px;
+          }
+          
+          #available-videos::-webkit-scrollbar-thumb {
+              background: #374151;
+              border-radius: 3px;
+          }
+          
+          #available-videos::-webkit-scrollbar-thumb:hover {
+              background: #4b5563;
+          }
+          
+          #available-videos .video-item {
+              transition: all 0.2s ease;
+          }
+          
+          #available-videos .video-item:hover {
+              transform: translateX(2px);
+          }
+
+          /* Estilos para la notificación de respuestas animadas */
+          #animated-responses-notification {
+              backdrop-filter: blur(8px);
+          }
+          
+          #animated-responses-notification.hide {
+              transform: translateY(-100%);
+          }
+
+    </style>
+</head>
+<body class="h-screen antialiased overflow-hidden">
+
+<!-- Notificación de Respuestas Animadas -->
+<div id="animated-responses-notification" class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-orange-600 to-red-600 text-white px-4 py-3 shadow-lg transform translate-y-0 transition-transform duration-300">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-orange-200 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-sm font-medium">
+                Estamos trabajando en nuevas funciones, aún no están todas las respuestas disponibles.
+            </span>
+        </div>
+        <button id="close-notification" class="text-orange-200 hover:text-white transition-colors p-1 rounded hover:bg-white/10">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<div class="flex h-screen bg-black text-gray-100 font-sans" style="padding-top: 0px;" id="main-app-container">
+    <!-- Mobile Sidebar Overlay -->
+    <div class="mobile-sidebar-overlay" id="mobile-overlay"></div>
+    
+    <!-- Contenedor del Menú de Perfil (Sidebar) -->
+    <aside id="sidebar" class="bg-black transition-all duration-300 ease-in-out w-64 overflow-hidden">
+        <div class="p-4 flex flex-col h-full">
+            <!-- Botón para nuevo chat -->
+            <button id="new-chat-btn" class="flex items-center justify-center w-full p-3 mb-6 bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span class="nav-text">Nuevo Chat</span>
+            </button>
+
+            <!-- Lista de Chats -->
+            <div class="flex-grow overflow-y-auto pr-2">
+                <h2 class="text-xs font-semibold text-gray-400 mb-2 uppercase nav-text chat-section-title">Historial</h2>
+                <ul id="chat-list" class="space-y-2">
+                    <!-- Los chats se cargarán dinámicamente aquí -->
+                </ul>
+            </div>
+
+            <!-- Cuadro de Videos Disponibles -->
+            <div class="mb-4 p-3 bg-gray-900/50 rounded-lg border border-gray-700/50">
+                <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    <h3 class="text-xs font-semibold text-gray-300 uppercase nav-text">Videos Disponibles</h3>
+                </div>
+                <div id="available-videos" class="space-y-1 text-xs text-gray-400">
+                    <!-- Los videos disponibles se cargarán aquí -->
+                </div>
+            </div>
+
+            <!-- Pie del Menú Lateral -->
+            <div class="border-t border-gray-800 pt-4">
+                <!-- Información del Usuario -->
+                <div class="flex items-center justify-between mb-4 p-2 rounded-md hover:bg-gray-800/50 transition-colors duration-200">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        <div class="nav-text">
+                            <div id="user-name" class="text-sm font-medium truncate">Cargando...</div>
+                            <div id="company-name" class="text-xs text-gray-400 truncate">Cargando...</div>
+                        </div>
+                    </div>
+                    <img id="profile-pic" src="https://placehold.co/32x32/1f2937/ef4444?text=A" alt="Foto de perfil" class="w-8 h-8 rounded-full border border-red-500/50 hover:border-red-400 transition-colors cursor-pointer flex-shrink-0">
+                </div>
+
+                <a href="#" class="flex items-center p-2 rounded-md text-sm hover:bg-gray-800/50 transition-colors duration-200 nav-link">
+                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="nav-text">Configuración</span>
+                </a>
+                <button id="logout-btn-sidebar" class="w-full flex items-center p-2 rounded-md text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors duration-200 nav-link">
+                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    <span class="nav-text">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Área Principal del Chat -->
+    <main id="main-content" class="flex-1 flex flex-col bg-black">
+        <!-- Encabezado del Chat -->
+        <header class="flex items-center justify-between p-4 border-b border-gray-800">
+            <button id="sidebar-toggle" class="p-2 hover:bg-gray-800 rounded-md">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                </svg>
+            </button>
+            <h1 id="chat-title" class="text-lg font-semibold">Chat de 3dE</h1>
+            <a href="home.html" class="p-2 hover:bg-gray-800 rounded-md text-gray-400 hover:text-white transition-colors" title="Volver al inicio">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+            </a>
+        </header>
+
+        <!-- Pantalla de Bienvenida -->
+        <div id="welcome-screen" class="relative flex flex-col items-center justify-center h-full w-full overflow-hidden">
+            <!-- Fondo con efecto de gradiente naranja más intenso -->
+            <div class="absolute inset-0 z-0">
+                <div class="absolute bottom-0 left-[-20%] right-0 top-[-10%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(234,88,12,0.25),rgba(255,255,255,0))]"></div>
+                <div class="absolute bottom-0 right-[-20%] top-[-10%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(234,88,12,0.25),rgba(255,255,255,0))]"></div>
+            </div>
+            
+            <!-- Contenedor del contenido principal -->
+            <div class="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full">
+                <!-- Título Principal con animación por letra -->
+                <h1 id="animated-title" class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight pb-4 flex justify-center flex-wrap" aria-label="3dE">
+                    <!-- Las letras se generarán con JavaScript -->
+                </h1>
+                
+                <!-- Subtítulo -->
+                <p class="mt-4 max-w-2xl text-lg md:text-xl text-gray-300 animate-fade-in-up" style="animation-delay: 1.2s;">
+                    Potencia tu creatividad y productividad. La inteligencia artificial de vanguardia diseñada para llevar tus ideas al siguiente nivel.
+                </p>
+
+                <!-- Barra de Texto para Iniciar Conversación -->
+                <div class="w-full max-w-3xl mt-16 animate-fade-in-up" style="animation-delay: 1.4s;">
+                    <form id="welcome-form">
+                        <div class="relative">
+                            <input 
+                                id="welcome-input" 
+                                type="text" 
+                                autocomplete="off" 
+                                placeholder="Inicia una conversación para ver la magia..." 
+                                class="w-full bg-gray-900/70 border border-gray-700 rounded-full py-4 pl-6 pr-16 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 backdrop-blur-sm transition-all duration-300"
+                            >
+                            <button 
+                                type="submit" 
+                                class="absolute right-2.5 top-1/2 -translate-y-1/2 bg-orange-600 text-white p-2.5 rounded-full disabled:bg-gray-600 disabled:cursor-not-allowed hover:bg-orange-500 transition-colors duration-200"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer sutil -->
+            <footer class="absolute bottom-5 text-center text-gray-600 text-sm w-full z-10">
+                <p>&copy; 2024 3dE. Todos los derechos reservados.</p>
+            </footer>
+        </div>
+
+        <!-- Contenedor principal reorganizado: video izquierda, chat derecha, input abajo -->
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <!-- Contenedor superior con video y chat lado a lado -->
+            <div class="flex flex-1 overflow-hidden">
+                <!-- Contenedor del Video - Lado izquierdo -->
+                <div id="video-container" class="hidden flex-1 p-4 flex flex-col items-center justify-center bg-black min-h-0">
+                    <video id="bot-video" class="w-full h-full object-contain rounded-lg shadow-lg" autoplay muted loop playsinline>
+                        <!-- El video idle se cargará aquí por JavaScript -->
+                        <source type="video/mp4">
+                        Tu navegador no soporta videos.
+                    </video>
+                    <p id="video-status" class="text-sm text-gray-400 mt-4 text-center font-medium">3dE</p>
+                </div>
+
+                <!-- Contenedor de Mensajes - Lado derecho -->
+                <div id="chat-container" class="hidden w-80 md:w-96 overflow-y-auto px-4 py-4 bg-black border-l border-gray-700 relative">
+                    <div id="message-area" class="space-y-3">
+                        <!-- Los mensajes se agregarán aquí dinámicamente -->
+                    </div>
+                    
+                    <!-- Botón para ir al final del chat -->
+                    <button id="scroll-to-bottom" class="hidden fixed bottom-20 right-8 bg-orange-600 hover:bg-orange-500 text-white p-3 rounded-full shadow-lg transition-all duration-300 z-20">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+        <!-- Área de Recomendaciones de Mensajes - Sin fondo -->
+        <div id="message-recommendations" class="px-2 py-2 hidden"> <!-- Reducido padding horizontal de px-4 a px-2 -->
+            <div class="max-w-5xl mx-auto"> <!-- Aumentado de max-w-3xl a max-w-5xl -->
+                <div class="flex items-center justify-between mb-2 px-2"> <!-- Agregado px-2 para compensar -->
+                    <span class="text-xs text-gray-400 font-medium">Preguntas sugeridas:</span>
+                    <button id="refresh-recommendations" class="text-xs text-orange-400 hover:text-orange-300 transition-colors">
+                        <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Actualizar
+                    </button>
+                </div>
+                <div id="recommendation-buttons" class="flex overflow-x-auto gap-3 pb-2 scrollbar-hide px-2"> <!-- Agregado px-2 -->
+                    <!-- Las recomendaciones se añadirán aquí dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de Entrada de Texto - Más compacta y pegada al fondo -->
+        <div id="chat-input-container" class="p-2 bg-black border-t border-gray-800 hidden">
+            <div class="max-w-3xl mx-auto">
+                <form id="chat-form">
+                    <div class="flex items-center bg-gray-800 border border-gray-700 rounded-xl p-1.5">
+                        <textarea id="chat-input" autocomplete="off" placeholder="Escribe un mensaje..." rows="1" class="flex-1 bg-transparent text-gray-100 placeholder-gray-400 focus:outline-none resize-none px-2 max-h-32 py-2 text-sm"></textarea>
+                        <div class="flex items-center gap-1 ml-1">
+                            <button type="submit" class="bg-red-600 text-white p-1.5 rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <p class="text-xs text-center text-gray-500 mt-1">
+                    La IA puede cometer errores. Considera verificar la información importante.
+                </p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- =========== SCRIPT UNIFICADO =========== -->
+<script src="js/config.js"></script>
+<script src="js/rag-handler.js"></script>
+<script type="module">
+    // Import functions from the Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // === RAG State Variable ===
+    let isRagReady = false;
+
+    // === Chat State Variables ===
+    let currentChatId = null;
+    let chats = [];
+    let userId = null;
+    let lastUserMessage = null;
+
+    // --- CONFIGURACIÓN ---
+    // ⚠️ IMPORTANTE: Reemplaza con tus claves de API reales.
+    const firebaseConfig = {
+        apiKey: "AIzaSyCgT1jWF9JzLrfj15ed4_wZrJOKLmL3vJ8", // <--- Unificada con login.html
+        authDomain: "empresa-ai.firebaseapp.com",
+        projectId: "empresa-ai",
+        storageBucket: "empresa-ai.appspot.com",
+        messagingSenderId: "525047010078",
+        appId: "1:525047010078:web:f8f5414def9b0701e26f0f",
+        measurementId: "G-TKKJK5MBYL"
+    };
+    
+    // ⚠️ ADVERTENCIA DE SEGURIDAD:
+    // Exponer tu clave de API de Gemini en el lado del cliente es INSEGURO y puede
+    // llevar a que sea robada y usada sin tu control, generando costos inesperados.
+    // La práctica recomendada es crear un backend (ej. una Cloud Function de Firebase)
+    // que reciba la pregunta del usuario y haga la llamada a la API de Gemini desde el servidor.
+    const GEMINI_API_KEY = "TU_API_KEY_GEMINI"; // <--- REEMPLAZA ESTO
+
+    // --- INICIALIZACIÓN DE FIREBASE ---
+    console.log("Initializing Firebase...");
+    console.log("Firebase config:", firebaseConfig);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    console.log("Firebase initialized successfully");
+    console.log("Auth object:", auth);
+    
+    // Verificar inmediatamente el estado de autenticación
+    console.log("Current user at startup:", auth.currentUser);
+
+    // --- ELEMENTOS DEL DOM ---
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const toggleIcon = document.getElementById('toggle-icon');
+    const userNameEl = document.getElementById('user-name');
+    const companyNameEl = document.getElementById('company-name');
+    const profilePicEl = document.getElementById('profile-pic');
+    const logoutBtn = document.getElementById('logout-btn-sidebar');
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const chatContainer = document.getElementById('chat-container');
+    const welcomeForm = document.getElementById('welcome-form');
+    const welcomeInput = document.getElementById('welcome-input');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const messageArea = document.getElementById('message-area');
+    const messageRecommendations = document.getElementById('message-recommendations');
+    const recommendationButtons = document.getElementById('recommendation-buttons');
+    const refreshRecommendationsBtn = document.getElementById('refresh-recommendations');
+    const videoContainer = document.getElementById('video-container');
+    const botVideo = document.getElementById('bot-video');
+    const videoStatus = document.getElementById('video-status');
+    
+    // --- LÓGICA DE VIDEO RESPUESTA CON BÚSQUEDA DIFUSA ---
+    const IDLE_VIDEOS = [
+        'videos-respuesta/idle.mp4',
+        'videos-respuesta/idle2.mp4'
+    ];
+    let currentIdleIndex = 0;
+    let idleRotationTimer = null;
+    const IDLE_ROTATION_INTERVAL = 8000; // Cambiar cada 8 segundos
+    
+    // Función para obtener el próximo video idle
+    const getNextIdleVideo = () => {
+        const video = IDLE_VIDEOS[currentIdleIndex];
+        console.log(`[VideoRotation] Seleccionando video idle: ${video} (índice: ${currentIdleIndex})`);
+        currentIdleIndex = (currentIdleIndex + 1) % IDLE_VIDEOS.length;
+        console.log(`[VideoRotation] Próximo índice será: ${currentIdleIndex}`);
+        return video;
+    };
+    
+    // Función para verificar si un video es idle
+    const isIdleVideo = (videoSrc) => {
+        const isIdle = IDLE_VIDEOS.some(idleVideo => videoSrc.includes(idleVideo));
+        console.log(`[VideoRotation] ¿Es video idle? ${videoSrc} -> ${isIdle}`);
+        return isIdle;
+    };
+    
+    // Función para iniciar la rotación automática de videos idle
+    const startIdleRotation = () => {
+        console.log(`[VideoRotation] Iniciando rotación automática cada ${IDLE_ROTATION_INTERVAL}ms`);
+        stopIdleRotation(); // Detener cualquier rotación previa
+        
+        idleRotationTimer = setInterval(() => {
+            const botVideo = document.getElementById('bot-video');
+            if (botVideo && isIdleVideo(botVideo.src)) {
+                const nextVideo = getNextIdleVideo();
+                console.log(`[VideoRotation] Rotación automática: cambiando a ${nextVideo}`);
+                botVideo.src = nextVideo;
+                botVideo.load();
+                botVideo.play().catch(e => console.error("Error en rotación automática:", e));
+            }
+        }, IDLE_ROTATION_INTERVAL);
+    };
+    
+    // Función para detener la rotación automática
+    const stopIdleRotation = () => {
+        if (idleRotationTimer) {
+            console.log('[VideoRotation] Deteniendo rotación automática');
+            clearInterval(idleRotationTimer);
+            idleRotationTimer = null;
+        }
+    };
+    
+    // Función para configurar un video como idle (con rotación automática)
+    const setIdleVideo = () => {
+        const botVideo = document.getElementById('bot-video');
+        if (botVideo) {
+            const nextVideo = getNextIdleVideo();
+            console.log(`[VideoRotation] Configurando video idle: ${nextVideo}`);
+            botVideo.src = nextVideo;
+            botVideo.loop = true;
+            botVideo.muted = true;
+            botVideo.load();
+            botVideo.play().catch(e => console.error("Error al reproducir video idle:", e));
+            
+            // Iniciar rotación automática
+            startIdleRotation();
+        }
+    };
+    
+    // Función para forzar la rotación de video idle (útil para debugging)
+    window.forceIdleRotation = () => {
+        console.log('[VideoRotation] Forzando rotación manual');
+        setIdleVideo(); // Usar la nueva función que reinicia el sistema
+    };
+    
+    const videoQuestions = [
+        // Preguntas sobre qué es el 3dE
+        { question: "¿que es el 3de?", videoSrc: "videos-respuesta/que es 3de.mp4" },
+        { question: "¿que es?", videoSrc: "videos-respuesta/que es 3de.mp4" },
+        { question: "¿Qué es el 3dE?", videoSrc: "videos-respuesta/que es 3de.mp4" },
+        { question: "que es tres dias de emprendimiento", videoSrc: "videos-respuesta/que es 3de.mp4" },
+        { question: "bootcamp", videoSrc: "videos-respuesta/que es 3de.mp4" },
+        
+        // Preguntas sobre organizadores
+        { question: "¿Quién organiza el evento 3dE?", videoSrc: "videos-respuesta/organizadores.mp4" },
+        { question: "¿quien organiza el evento?", videoSrc: "videos-respuesta/organizadores.mp4" },
+        { question: "organizadores", videoSrc: "videos-respuesta/organizadores.mp4" },
+        { question: "universidades participantes", videoSrc: "videos-respuesta/organizadores.mp4" },
+        { question: "camara de comercio", videoSrc: "videos-respuesta/organizadores.mp4" },
+        { question: "instituciones universitarias", videoSrc: "videos-respuesta/organizadores.mp4" },
+        
+        // Preguntas sobre participantes
+        { question: "¿quienes pueden participar en el 3de?", videoSrc: "videos-respuesta/participantes.mp4" },
+        { question: "¿Quiénes pueden participar?", videoSrc: "videos-respuesta/participantes.mp4" },
+        { question: "participar", videoSrc: "videos-respuesta/participantes.mp4" },
+        { question: "estudiantes universitarios", videoSrc: "videos-respuesta/participantes.mp4" },
+        { question: "quien puede participar", videoSrc: "videos-respuesta/participantes.mp4" },
+        
+        // Preguntas sobre requisitos
+        { question: "¿Cuáles son los requisitos para participar?", videoSrc: "videos-respuesta/requisitos.mp4" },
+        { question: "requisitos para participar", videoSrc: "videos-respuesta/requisitos.mp4" },
+        { question: "requisitos", videoSrc: "videos-respuesta/requisitos.mp4" },
+        { question: "¿qué necesito para participar?", videoSrc: "videos-respuesta/requisitos.mp4" },
+        { question: "matrícula activa", videoSrc: "videos-respuesta/requisitos.mp4" },
+        { question: "mayor de edad", videoSrc: "videos-respuesta/requisitos.mp4" },
+        
+        // Preguntas sobre restricciones de participación
+        { question: "¿Por qué no puedo participar si ya tengo una idea de negocio?", videoSrc: "videos-respuesta/no-puedo-participar-si-ya-tengo-idea.mp4" },
+        { question: "¿por que no puedo participar si ya tengo una idea?", videoSrc: "videos-respuesta/no-puedo-participar-si-ya-tengo-idea.mp4" },
+        { question: "ya tengo una idea de negocio", videoSrc: "videos-respuesta/no-puedo-participar-si-ya-tengo-idea.mp4" },
+        { question: "tengo idea de negocio", videoSrc: "videos-respuesta/no-puedo-participar-si-ya-tengo-idea.mp4" },
+        { question: "restricciones para participar", videoSrc: "videos-respuesta/no-puedo-participar-si-ya-tengo-idea.mp4" },
+        { question: "¿por qué no puedo participar?", videoSrc: "videos-respuesta/no-puedo-participar-si-ya-tengo-idea.mp4" },
+        
+        // Preguntas sobre relación con Gofest
+        { question: "¿Por qué el 3dE es parte de Gofest? ¿Qué beneficios trae eso?", videoSrc: "videos-respuesta/Por qué el 3dE es parte de Gofest.mp4" },
+        { question: "¿por que el 3de es parte de gofest?", videoSrc: "videos-respuesta/Por qué el 3dE es parte de Gofest.mp4" },
+        { question: "que beneficios trae ser parte de gofest", videoSrc: "videos-respuesta/Por qué el 3dE es parte de Gofest.mp4" },
+        { question: "relacion con gofest", videoSrc: "videos-respuesta/Por qué el 3dE es parte de Gofest.mp4" },
+        { question: "gofest", videoSrc: "videos-respuesta/Por qué el 3dE es parte de Gofest.mp4" },
+        { question: "festival de emprendimiento", videoSrc: "videos-respuesta/Por qué el 3dE es parte de Gofest.mp4" },
+        { question: "semillero de talento", videoSrc: "videos-respuesta/Por qué el 3dE es parte de Gofest.mp4" },
+        { question: "inversionistas", videoSrc: "videos-respuesta/Por qué el 3dE es parte de Gofest.mp4" },
+        
+        // Preguntas sobre mentores
+        { question: "¿Cuál es exactamente el rol de los mentores?", videoSrc: "videos-respuesta/mentores.mp4" },
+        { question: "¿cual es el rol de los mentores?", videoSrc: "videos-respuesta/mentores.mp4" },
+        { question: "rol de los mentores", videoSrc: "videos-respuesta/mentores.mp4" },
+        { question: "mentores", videoSrc: "videos-respuesta/mentores.mp4" },
+        { question: "¿que hacen los mentores?", videoSrc: "videos-respuesta/mentores.mp4" },
+        { question: "función de los mentores", videoSrc: "videos-respuesta/mentores.mp4" },
+        { question: "acompañamiento mentores", videoSrc: "videos-respuesta/mentores.mp4" },
+        { question: "consultores empresariales", videoSrc: "videos-respuesta/mentores.mp4" },
+        { question: "guías", videoSrc: "videos-respuesta/mentores.mp4" },
+        
+        // Preguntas sobre retos
+        { question: "¿Cuáles son los retos del 3dE 2025?", videoSrc: "videos-respuesta/retos.mp4" },
+        { question: "¿cuales son los retos del 3de?", videoSrc: "videos-respuesta/retos.mp4" },
+        { question: "retos del 3de", videoSrc: "videos-respuesta/retos.mp4" },
+        { question: "retos", videoSrc: "videos-respuesta/retos.mp4" },
+        { question: "¿que retos hay?", videoSrc: "videos-respuesta/retos.mp4" },
+        { question: "empresas patrocinadoras", videoSrc: "videos-respuesta/retos.mp4" },
+        { question: "corporacion colombiana de logistica", videoSrc: "videos-respuesta/retos.mp4" },
+        { question: "comestibles ricos", videoSrc: "videos-respuesta/retos.mp4" },
+        { question: "schneider electric", videoSrc: "videos-respuesta/retos.mp4" },
+        { question: "dexson", videoSrc: "videos-respuesta/retos.mp4" },
+        { question: "ccl", videoSrc: "videos-respuesta/retos.mp4" },
+        
+        // Preguntas sobre fecha y lugar
+        { question: "¿Cuándo y dónde se realizará el 3dE 2025?", videoSrc: "videos-respuesta/cuando y donde.mp4" },
+        { question: "¿cuando y donde se realizara el 3de 2025?", videoSrc: "videos-respuesta/cuando y donde.mp4" },
+        { question: "fecha del 3de", videoSrc: "videos-respuesta/cuando y donde.mp4" },
+        { question: "lugar del 3de", videoSrc: "videos-respuesta/cuando y donde.mp4" },
+        { question: "cuando es el 3de", videoSrc: "videos-respuesta/cuando y donde.mp4" },
+        { question: "donde es el 3de", videoSrc: "videos-respuesta/cuando y donde.mp4" },
+        { question: "agora centro de convenciones", videoSrc: "videos-respuesta/cuando y donde.mp4" },
+        { question: "27 28 29 agosto", videoSrc: "videos-respuesta/cuando y donde.mp4" },
+        { question: "agosto 2025", videoSrc: "videos-respuesta/cuando y donde.mp4" },
+        { question: "calle 24", videoSrc: "videos-respuesta/cuando y donde.mp4" },
+        
+        // Preguntas sobre jurados
+        { question: "¿Quiénes evalúan las propuestas?", videoSrc: "videos-respuesta/jurados.mp4" },
+        { question: "¿quienes evaluan las propuestas?", videoSrc: "videos-respuesta/jurados.mp4" },
+        { question: "jurados", videoSrc: "videos-respuesta/jurados.mp4" },
+        { question: "¿quien evalua los proyectos?", videoSrc: "videos-respuesta/jurados.mp4" },
+        { question: "evaluadores", videoSrc: "videos-respuesta/jurados.mp4" },
+        { question: "¿quienes son los jueces?", videoSrc: "videos-respuesta/jurados.mp4" },
+        { question: "jueces del evento", videoSrc: "videos-respuesta/jurados.mp4" },
+        { question: "ecosistema de emprendimiento", videoSrc: "videos-respuesta/jurados.mp4" },
+        { question: "entidades nacionales", videoSrc: "videos-respuesta/jurados.mp4" },
+        { question: "instituciones internacionales", videoSrc: "videos-respuesta/jurados.mp4" },
+        
+        // Preguntas sobre proyectos ganadores
+        { question: "¿Qué tipo de proyectos han ganado en ediciones anteriores?", videoSrc: "videos-respuesta/proyectos ganadores.mp4" },
+        { question: "¿que tipo de proyectos han ganado?", videoSrc: "videos-respuesta/proyectos ganadores.mp4" },
+        { question: "proyectos ganadores", videoSrc: "videos-respuesta/proyectos ganadores.mp4" },
+        { question: "ediciones anteriores", videoSrc: "videos-respuesta/proyectos ganadores.mp4" },
+        { question: "¿que proyectos ganaron antes?", videoSrc: "videos-respuesta/proyectos ganadores.mp4" },
+        { question: "ejemplos de proyectos ganadores", videoSrc: "videos-respuesta/proyectos ganadores.mp4" },
+        { question: "construccion sostenible", videoSrc: "videos-respuesta/proyectos ganadores.mp4" },
+        { question: "fintech", videoSrc: "videos-respuesta/proyectos ganadores.mp4" },
+        { question: "industrias creativas", videoSrc: "videos-respuesta/proyectos ganadores.mp4" },
+        { question: "transporte de carga", videoSrc: "videos-respuesta/proyectos ganadores.mp4" },
+        { question: "plataformas fintech", videoSrc: "videos-respuesta/proyectos ganadores.mp4" },
+        
+        // Preguntas sobre evaluación de proyectos
+        { question: "¿Cómo se evalúan los proyectos?", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "¿como se evaluan los proyectos?", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "criterios de evaluacion", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "como evaluan", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "ponderaciones", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "coherencia con el reto", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "originalidad", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "encaje problema-solucion", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "viabilidad de implementacion", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "formato de presentacion", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "desempeño en el pitch", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        
+        // Preguntas sobre acompañamiento
+        { question: "¿Habrá acompañamiento durante el evento?", videoSrc: "videos-respuesta/acompañamiento.mp4" },
+        { question: "¿habra acompañamiento durante el evento?", videoSrc: "videos-respuesta/acompañamiento.mp4" },
+        { question: "acompañamiento", videoSrc: "videos-respuesta/acompañamiento.mp4" },
+        { question: "¿habra apoyo durante el evento?", videoSrc: "videos-respuesta/acompañamiento.mp4" },
+        { question: "apoyo durante el evento", videoSrc: "videos-respuesta/acompañamiento.mp4" },
+        { question: "mentores expertos", videoSrc: "videos-respuesta/acompañamiento.mp4" },
+        { question: "consultores empresariales", videoSrc: "videos-respuesta/acompañamiento.mp4" },
+        { question: "docentes", videoSrc: "videos-respuesta/acompañamiento.mp4" },
+        { question: "empresarios", videoSrc: "videos-respuesta/acompañamiento.mp4" },
+        { question: "guiarán a los equipos", videoSrc: "videos-respuesta/acompañamiento.mp4" },
+        { question: "resolverán inquietudes", videoSrc: "videos-respuesta/acompañamiento.mp4" },
+        
+        // Preguntas sobre premios y reconocimientos
+        { question: "¿Qué premios o reconocimientos se entregan?", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "¿que premios o reconocimientos se entregan?", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "premios", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "reconocimientos", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "¿que premios hay?", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "certificado digital", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "certificado de participacion", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "80% de asistencia", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "equipos ganadores", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "universidades y empresas", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "¿que ganan los equipos?", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        
+        // Preguntas sobre dinámica del evento
+        { question: "¿Cómo es la dinámica del 3dE?", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "¿como es la dinamica del 3de?", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "dinamica", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "metodologia", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "bootcamp", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "tres momentos", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "dia 1 innova", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "dia 2 implementa", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "dia 3 impacta", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "innova implementa impacta", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "ideacion de soluciones", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "construyen prototipo", videoSrc: "videos-respuesta/dinamica.mp4" },
+        { question: "pitch final", videoSrc: "videos-respuesta/dinamica.mp4" },
+        
+        // Preguntas sobre material de apoyo
+        { question: "¿Se proporciona material de apoyo?", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        { question: "¿se proporciona material de apoyo?", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        { question: "material de apoyo", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        { question: "materiales y recursos", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        { question: "¿dan materiales?", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        { question: "recursos para cada fase", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        { question: "como hacer un buen pitch", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        { question: "video sobre pitch", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        { question: "segmentacion de clientes", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        { question: "bases para emprender", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        { question: "enlaces a videos", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        { question: "fase impacta", videoSrc: "videos-respuesta/material de apoyo.mp4" },
+        
+        // Preguntas sobre datos personales
+        { question: "¿Cómo se manejan los datos personales?", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "¿como se manejan los datos personales?", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "datos personales", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "manejo de datos", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "informacion personal", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "bases de datos", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "entidades organizadoras", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "futuros eventos", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "actualizar datos", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "rectificar datos", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "eliminar datos", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "yeisson querubin", videoSrc: "videos-respuesta/datos personales.mp4" },
+        { question: "yeisson.reyes@ccb.org.co", videoSrc: "videos-respuesta/datos personales.mp4" },
+        
+        // Preguntas sobre costos
+        { question: "¿Hay algún costo para participar?", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "¿hay algun costo para participar?", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "costo", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "costos", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "¿es gratis?", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "precio", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "¿cuanto cuesta?", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "costo de inscripcion", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "inscripcion gratuita", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "gratis", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "¿hay que pagar?", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "tarifa", videoSrc: "videos-respuesta/costos.mp4" },
+        
+        // Preguntas sobre tipo de retos
+        { question: "¿Qué tipo de retos puedo esperar de las empresas patrocinadoras?", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "¿que tipo de retos puedo esperar?", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "tipo de retos", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "¿que retos esperan?", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "problemas estrategicos", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "logistica 4.0", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "ultima milla", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "analisis predictivo", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "logistica sostenible", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "empaques biodegradables", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "snacks saludables", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "energia inteligente", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "autoconsumo energia solar", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "vehiculos electricos", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "iot edificios", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        
+        // Preguntas sobre historial del evento
+        { question: "¿Este evento es nuevo? ¿Qué resultados ha tenido en el pasado?", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "¿este evento es nuevo?", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "historial", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "resultados del pasado", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "¿que resultados ha tenido?", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "evento consolidado", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "once años", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "trayectoria", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "ediciones pasadas", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "100 universitarios", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "20 ideas de negocio", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "36 horas", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "40 mentores", videoSrc: "videos-respuesta/historial.mp4" },
+        { question: "innovacion", videoSrc: "videos-respuesta/historial.mp4" },
+        
+        // Preguntas sobre horario del evento
+        { question: "¿Cuál es el horario del evento?", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "¿cual es el horario del evento?", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "horario", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "¿a que hora empieza?", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "¿a que hora termina?", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "8:00 a.m.", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "5:00 p.m.", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "jornada completa", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "hora de inicio", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "hora de finalizacion", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "durante todo el dia", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "asistir completo", videoSrc: "videos-respuesta/horario.mp4" },
+        
+        // Preguntas sobre propiedad intelectual
+        { question: "¿Qué pasa con la propiedad intelectual de las ideas generadas?", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "¿que pasa con la propiedad intelectual?", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "propiedad intelectual", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "ideas generadas", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "¿de quien son las ideas?", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "empresas desarrollar ideas", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "ideas ganadoras", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "registrar propiedad", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "un año", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "derechos morales", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "equipo creador", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "apropiarse de la idea", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        { question: "derecho de apropiar", videoSrc: "videos-respuesta/propiedad intelectual.mp4" },
+        
+        // Preguntas sobre oportunidades para ganadores
+        { question: "Más allá del certificado, ¿qué oportunidades reales existen para los ganadores?", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "¿que oportunidades tienen los ganadores?", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "oportunidades para ganadores", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "oportunidades reales", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "mas alla del certificado", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "beneficios ganadores", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "¿que ganan los ganadores?", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "ventajas para equipos ganadores", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "oportunidades laborales", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "oportunidades de negocio", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "contactos empresariales", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "networking ganadores", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        { question: "beneficios adicionales", videoSrc: "videos-respuesta/oportunidades para ganadores.mp4" },
+        
+        // Preguntas sobre habilidades que se promueven
+        { question: "¿Qué habilidades se promueven?", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "¿que habilidades se desarrollan?", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "habilidades", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "competencias", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "destrezas", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "habilidades blandas", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "habilidades tecnicas", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "skills", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "capacidades", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "aprendizajes", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "competencias desarrolladas", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "que se aprende", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "formacion", videoSrc: "videos-respuesta/habilidades.mp4" },
+        
+        // Preguntas sobre qué pasa si la empresa no desarrolla la idea
+        { question: "¿Qué pasa con mi idea si la empresa no la desarrolla después de un año?", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "¿que pasa si no desarrollan mi idea?", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "no desarrollo", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "empresa no desarrolla", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "después de un año", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "si no usan mi idea", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "recuperar mi idea", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "idea sin desarrollar", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "derechos después del año", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "apropiarse después", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "volver a tener mi idea", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "empresa abandona idea", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        { question: "no implementan", videoSrc: "videos-respuesta/no desarrollo.mp4" }
+    ];
+
+    const fuseOptions = {
+        includeScore: true,
+        keys: ['question'],
+        threshold: 0.4 // Ajustar este umbral (0.0 es coincidencia exacta, 1.0 es cualquier cosa)
+    };
+
+    // --- FUNCIÓN PARA CARGAR VIDEOS DISPONIBLES EN EL SIDEBAR ---
+    const loadAvailableVideos = () => {
+        const availableVideosContainer = document.getElementById('available-videos');
+        if (!availableVideosContainer) return;
+
+        // Crear lista única de videos (sin duplicados)
+        const uniqueVideos = [];
+        const seenVideos = new Set();
+
+        videoQuestions.forEach(item => {
+            if (!seenVideos.has(item.videoSrc)) {
+                seenVideos.add(item.videoSrc);
+                // Extraer nombre limpio del video
+                const videoName = item.videoSrc.replace('videos-respuesta/', '').replace('.mp4', '');
+                const displayName = videoName.charAt(0).toUpperCase() + videoName.slice(1);
+                uniqueVideos.push({
+                    name: displayName,
+                    question: item.question,
+                    src: item.videoSrc
+                });
+            }
+        });
+
+        // Limpiar contenedor
+        availableVideosContainer.innerHTML = '';
+
+        // Crear elementos para cada video
+        uniqueVideos.forEach(video => {
+            const videoItem = document.createElement('div');
+            videoItem.className = 'video-item flex items-center gap-2 p-2 rounded hover:bg-gray-800/50 cursor-pointer transition-colors group';
+            videoItem.innerHTML = `
+                <div class="w-2 h-2 bg-orange-400 rounded-full flex-shrink-0 group-hover:bg-orange-300"></div>
+                <span class="text-xs text-gray-400 group-hover:text-gray-300 truncate nav-text">${video.name}</span>
+            `;
+            
+            // Hacer clic para reproducir el video
+            videoItem.addEventListener('click', () => {
+                if (botVideo) {
+                    console.log(`[Sidebar] Reproduciendo video: ${video.src}`);
+                    videoStatus.textContent = `Reproduciendo: ${video.name}`;
+                    
+                    // Detener rotación automática durante reproducción de respuesta
+                    stopIdleRotation();
+                    
+                    botVideo.src = video.src;
+                    botVideo.loop = false;
+                    botVideo.muted = false;
+                    
+                    const playPromise = botVideo.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.error("[Sidebar] Error al reproducir video:", error);
+                            videoStatus.textContent = 'Error al reproducir video';
+                        });
+                    }
+                    
+                    // Restaurar video idle cuando termine
+                    botVideo.addEventListener('ended', () => {
+                        setIdleVideo(); // Usar la nueva función que incluye rotación automática
+                        videoStatus.textContent = '3dE';
+                    }, { once: true });
+                }
+            });
+
+            availableVideosContainer.appendChild(videoItem);
+        });
+    };
+
+    const fuse = new Fuse(videoQuestions, fuseOptions);
+
+    const playResponseVideo = (userMessage) => {
+        console.log(`[VideoLogic] Buscando video para: "${userMessage}"`);
+        
+        const results = fuse.search(userMessage);
+        console.log(`[VideoLogic] Resultados de Fuse.js:`, results);
+
+        if (results.length > 0) {
+            const bestMatch = results[0];
+            // El score de Fuse.js es 0 para una coincidencia perfecta. Un score bajo es mejor.
+            if (bestMatch.score < 0.4) { // Umbral de confianza
+                const videoSrc = bestMatch.item.videoSrc;
+                const matchedQuestion = bestMatch.item.question;
+                console.log(`[VideoLogic] ¡Coincidencia encontrada! Pregunta: "${matchedQuestion}", Score: ${bestMatch.score}, Video: ${videoSrc}`);
+                
+                if (videoSrc && botVideo) {
+                    console.log(`[VideoLogic] Reproduciendo video: ${videoSrc}`);
+                    videoStatus.textContent = 'Reproduciendo respuesta en video...';
+                    
+                    // Detener rotación automática durante reproducción de respuesta
+                    stopIdleRotation();
+                    
+                    botVideo.src = videoSrc;
+                    botVideo.loop = false;
+                    botVideo.muted = false;
+                    
+                    const playPromise = botVideo.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.error("[VideoLogic] Error al intentar reproducir el video:", error);
+                            videoStatus.textContent = 'Error al reproducir video. Habilita el sonido en el navegador.';
+                        });
+                    }
+                    
+                    // Restaurar video idle cuando termine
+                    botVideo.addEventListener('ended', () => {
+                        console.log("[VideoLogic] Video terminado, volviendo al estado idle");
+                        setIdleVideo(); // Usar la nueva función que incluye rotación automática
+                        videoStatus.textContent = '3dE';
+                    }, { once: true });
+                    
+                    return true; // Video encontrado y reproducido
+                }
+            } else {
+                console.log(`[VideoLogic] La mejor coincidencia no supera el umbral de confianza. Score: ${bestMatch.score}`);
+            }
+        }
+        
+        console.log("[VideoLogic] No se encontró ningún video para esta pregunta.");
+        return false; // No se encontró video
+    };
+
+    if (botVideo) {
+        botVideo.addEventListener('ended', () => {
+            // Solo vuelve al estado idle si no es un video idle
+            if (!isIdleVideo(botVideo.src)) {
+                console.log('[VideoRotation] El video de respuesta ha terminado, volviendo al estado de espera.');
+                videoStatus.textContent = '3dE';
+                setIdleVideo(); // Usar la nueva función que incluye rotación automática
+            }
+        });
+    }
+    
+    // --- FIN LÓGICA DE VIDEO RESPUESTA ---
+    
+    // Debug DOM elements
+    console.log('DOM Elements check:');
+    console.log('userNameEl:', userNameEl);
+    console.log('companyNameEl:', companyNameEl);
+    console.log('profilePicEl:', profilePicEl);
+    console.log('messageArea:', messageArea);
+    console.log('chatContainer:', chatContainer);
+    console.log('welcomeForm:', welcomeForm);
+    console.log('chatForm:', chatForm);
+    
+    let userProfile = {
+        photoURL: 'https://placehold.co/40x40/1f2937/ef4444?text=U',
+        initial: 'U',
+        name: 'Usuario'
+    };
+
+    // --- LÓGICA DEL SIDEBAR ---
+    const isMobile = () => window.innerWidth <= 768;
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    
+    sidebarToggle.addEventListener('click', () => {
+        if (isMobile()) {
+            // Lógica para móvil
+            sidebar.classList.toggle('mobile-open');
+            mobileOverlay.classList.toggle('active');
+        } else {
+            // Lógica para desktop
+        sidebar.classList.toggle('collapsed');
+        }
+    });
+    
+    // Cerrar sidebar en móvil al hacer click en overlay
+    if (mobileOverlay) {
+        mobileOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('mobile-open');
+            mobileOverlay.classList.remove('active');
+        });
+    }
+    
+    // Ajustar sidebar al redimensionar ventana
+    window.addEventListener('resize', () => {
+        if (!isMobile()) {
+            sidebar.classList.remove('mobile-open');
+            mobileOverlay.classList.remove('active');
+        }
+    });
+
+    // --- LÓGICA DE AUTENTICACIÓN Y DATOS DE USUARIO ---
+    onAuthStateChanged(auth, async (user) => {
+        console.log("Auth state changed:", user ? "User logged in" : "No user");
+        console.log("User object:", user);
+        
+        if (user) {
+            console.log("User UID:", user.uid);
+            console.log("User email:", user.email);
+            console.log("User displayName:", user.displayName);
+            
+            // Set userId for chat functionality
+            userId = user.uid;
+            
+            try {
+                const userDocRef = doc(db, 'users', user.uid);
+                console.log("Fetching user document from Firestore...");
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    console.log("User data from Firestore:", userData);
+                    
+                    const userName = userData.name || user.displayName || user.email?.split('@')[0] || 'Usuario';
+                    const initial = userName.charAt(0).toUpperCase();
+                    
+                    console.log('Updating user profile with:', { userName, company: userData.company });
+                    console.log('userNameEl exists:', !!userNameEl);
+                    console.log('companyNameEl exists:', !!companyNameEl);
+                    
+                    if (userNameEl) {
+                    userNameEl.textContent = userName;
+                        console.log('User name updated to:', userName);
+                    } else {
+                        console.error('userNameEl not found!');
+                    }
+                    
+                    if (companyNameEl) {
+                    companyNameEl.textContent = userData.company || 'Sin universidad';
+                        console.log('University name updated to:', userData.company || 'Sin universidad');
+                    } else {
+                        console.error('companyNameEl not found!');
+                    }
+                    userProfile.initial = initial;
+                    userProfile.name = userName; // Actualizar el nombre en el perfil
+
+                    if (userData.photoURL) {
+                        profilePicEl.src = userData.photoURL;
+                        userProfile.photoURL = userData.photoURL;
+                    } else {
+                        const placeholderUrl = `https://placehold.co/48x48/1f2937/ef4444?text=${initial}`;
+                        profilePicEl.src = placeholderUrl;
+                        userProfile.photoURL = placeholderUrl.replace('48x48', '40x40');
+                    }
+                    
+                    console.log("Profile updated successfully");
+                    
+                    // === RAG Initialization ===
+                    if (!isRagReady) {
+                        const apiKey = window.GEMINI_CONFIG?.apiKey;
+                        if (apiKey) {
+                            console.log("Initializing RAG system...");
+                            isRagReady = await window.initializeRAG(apiKey);
+                            if (!isRagReady) {
+                                addMessage('Error: No se pudo cargar la base de conocimiento del chat.', 'received');
+                                                    } else {
+                            console.log("RAG system ready!");
+                            setTimeout(() => {
+                                initializeChatSystem();
+                            }, 500);
+                        }
+                    } else {
+                        console.error("API Key de Gemini no encontrada para inicializar RAG.");
+                    }
+                }
+                } else {
+                    console.log("No user document found in Firestore, using Firebase Auth data");
+                    const displayName = user.displayName || user.email?.split('@')[0] || 'Usuario';
+                    const initial = displayName.charAt(0).toUpperCase();
+                    
+                    console.log('Updating user profile (fallback) with:', { displayName });
+                    
+                    if (userNameEl) {
+                    userNameEl.textContent = displayName;
+                        console.log('User name updated to:', displayName);
+                    } else {
+                        console.error('userNameEl not found in fallback!');
+                    }
+                    
+                    if (companyNameEl) {
+                    companyNameEl.textContent = 'Completa tu perfil';
+                        console.log('Company name updated to: Completa tu perfil');
+                    } else {
+                        console.error('companyNameEl not found in fallback!');
+                    }
+                    userProfile.initial = initial;
+                    userProfile.name = displayName; // Actualizar el nombre en el perfil
+                    
+                    const placeholderUrl = `https://placehold.co/48x48/1f2937/ef4444?text=${initial}`;
+                    profilePicEl.src = placeholderUrl;
+                    userProfile.photoURL = placeholderUrl.replace('48x48', '40x40');
+                    
+                    console.log("Profile updated with Auth data");
+                    
+                    // === RAG Initialization ===
+                    if (!isRagReady) {
+                        const apiKey = window.GEMINI_CONFIG?.apiKey;
+                        if (apiKey) {
+                            console.log("Initializing RAG system...");
+                            isRagReady = await window.initializeRAG(apiKey);
+                            if (!isRagReady) {
+                                addMessage('Error: No se pudo cargar la base de conocimiento del chat.', 'received');
+                            } else {
+                                console.log("RAG system ready!");
+                            }
+                        } else {
+                            console.error("API Key de Gemini no encontrada para inicializar RAG.");
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                console.log("Falling back to Firebase Auth data");
+                
+                // Fallback a datos de Firebase Auth
+                const displayName = user.displayName || user.email?.split('@')[0] || 'Usuario';
+                const initial = displayName.charAt(0).toUpperCase();
+                
+                console.log('Updating user profile (error fallback) with:', { displayName });
+                
+                if (userNameEl) {
+                userNameEl.textContent = displayName;
+                    console.log('User name updated to:', displayName);
+                } else {
+                    console.error('userNameEl not found in error fallback!');
+                }
+                
+                if (companyNameEl) {
+                companyNameEl.textContent = 'Error al cargar universidad';
+                    console.log('Company name updated to: Error al cargar empresa');
+                } else {
+                    console.error('companyNameEl not found in error fallback!');
+                }
+                userProfile.initial = initial;
+                userProfile.name = displayName; // Actualizar el nombre en el perfil
+                
+                const placeholderUrl = `https://placehold.co/48x48/1f2937/ef4444?text=${initial}`;
+                profilePicEl.src = placeholderUrl;
+                userProfile.photoURL = placeholderUrl.replace('48x48', '40x40');
+                
+                // === RAG Initialization ===
+                if (!isRagReady) {
+                    const apiKey = window.GEMINI_CONFIG?.apiKey;
+                    if (apiKey) {
+                        console.log("Initializing RAG system...");
+                                                    isRagReady = await window.initializeRAG(apiKey);
+                        if (!isRagReady) {
+                            addMessage('Error: No se pudo cargar la base de conocimiento del chat.', 'received');
+                        } else {
+                            console.log("RAG system ready!");
+                            // Inicializar sistema completo después de RAG
+                            setTimeout(() => {
+                                initializeChatSystem();
+                            }, 500);
+                        }
+                    } else {
+                        console.error("API Key de Gemini no encontrada para inicializar RAG.");
+                    }
+                }
+            }
+            
+            // Load chats after user profile is set up
+            try {
+                await loadChats();
+                
+                // If there are chats, select the first one, otherwise show welcome screen
+                if (chats.length > 0) {
+                    selectChat(chats[0].id);
+                } else {
+                    // Ensure welcome screen is shown
+                    document.getElementById('welcome-screen').classList.remove('hidden');
+                    document.getElementById('chat-container').classList.add('hidden');
+                    document.getElementById('chat-input-container').classList.add('hidden');
+                    
+                    // Mostrar recomendaciones en la pantalla de bienvenida
+                    setTimeout(() => {
+                        if (messageRecommendations) {
+                            messageRecommendations.classList.remove('hidden');
+                            showMessageRecommendations();
+                        }
+                    }, 500);
+                }
+            } catch (error) {
+                console.error('Error loading chats:', error);
+            }
+        } else {
+            console.log("User is not signed in");
+            userNameEl.textContent = 'No autenticado';
+            companyNameEl.textContent = 'Inicia sesión';
+            
+            // Clear user state
+            userId = null;
+            currentChatId = null;
+            chats = [];
+            
+            // Clear chat list UI
+            const chatListDiv = document.getElementById('chat-list');
+            if (chatListDiv) chatListDiv.innerHTML = '';
+            
+            // Mostrar mensaje y botón para ir al login
+            setTimeout(() => {
+                if (confirm('No tienes una sesión activa. ¿Quieres ir a la página de login?')) {
+                    window.location.href = 'login.html';
+                }
+            }, 2000);
+        }
+    });
+
+    // --- LÓGICA DE CERRAR SESIÓN ---
+    logoutBtn.addEventListener('click', () => {
+        signOut(auth).catch((error) => console.error('Error signing out:', error));
+    });
+
+    // --- LÓGICA DEL CHAT ---
+    const addMessage = (text, type, elementId = null) => {
+        const messageId = elementId || `msg-${Date.now()}`;
+        const isUser = type === 'sent';
+        
+        console.log(`Adding message: type="${type}", isUser=${isUser}, text="${text.substring(0, 50)}..."`);
+
+        const messageHTML = `
+            <div id="${messageId}" class="message ${isUser ? 'user' : ''}">
+                <div class="message-avatar ${isUser ? 'user' : 'ai'}">
+                    ${isUser ? 
+                        `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>` : 
+                        `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>`
+                    }
+                </div>
+                <div class="message-content ${isUser ? 'user' : 'ai'}">
+                    <p class="message-text">${isUser ? text : ''}</p>
+                </div>
+            </div>
+        `;
+        
+        if (!messageArea) {
+            console.error('messageArea not found!');
+            return messageId;
+        }
+        
+        console.log('Inserting message HTML into messageArea');
+        messageArea.insertAdjacentHTML('beforeend', messageHTML);
+        
+        // Verificar que el mensaje se agregó
+        const addedElement = document.getElementById(messageId);
+        console.log('Message element added:', !!addedElement);
+        
+        // Si es un mensaje de IA, aplicar formato mejorado inmediatamente
+        if (!isUser && addedElement) {
+            const textParagraph = addedElement.querySelector('.message-text');
+            if (textParagraph) {
+                const formattedText = formatAIResponse(text);
+                
+                // Enhanced markdown to HTML conversion (sin headers, solo negritas)
+                let html = formattedText
+                    // Separators
+                    .replace(/^---$/gm, '<hr class="my-4 border-gray-600">')
+                    // Bold and italic
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em class="text-gray-300 italic">$1</em>')
+                    // Inline code
+                    .replace(/`([^`]+)`/g, '<code class="bg-gray-700 text-orange-300 rounded px-2 py-1 text-sm font-mono">$1</code>')
+                    // Code blocks
+                    .replace(/```([\s\S]*?)```/g, '<pre class="bg-gray-800 text-gray-200 rounded-lg p-3 my-3 overflow-x-auto"><code>$1</code></pre>')
+                    // Lists
+                    .replace(/^\*   /gm, '&nbsp;&nbsp;&nbsp;&nbsp;• ')
+                    .replace(/^\* /gm, '• ')
+                    // Quotes
+                    .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-orange-500 pl-4 py-2 bg-gray-800/50 italic text-gray-300 my-2">$1</blockquote>')
+                    // Newlines
+                    .replace(/\n/g, '<br>');
+                
+                textParagraph.innerHTML = html;
+            }
+        }
+        
+        // Scroll to bottom
+        const container = document.getElementById('chat-container');
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+            // Actualizar indicador de scroll después de agregar el mensaje
+            updateScrollIndicator();
+        }
+        
+        return messageId;
+    };
+    
+    // --- FUNCIÓN PARA ACTUALIZAR EL INDICADOR DE SCROLL ---
+    const updateScrollIndicator = () => {
+        const container = document.getElementById('chat-container');
+        const scrollButton = document.getElementById('scroll-to-bottom');
+        if (!container || !scrollButton) return;
+        
+        // Verificar si hay contenido que se puede scrollear
+        const hasScrollableContent = container.scrollHeight > container.clientHeight;
+        const isScrolledFromTop = container.scrollTop > 20;
+        const isNearBottom = container.scrollTop >= (container.scrollHeight - container.clientHeight - 50);
+        
+        // Mostrar indicador visual de contenido arriba
+        if (hasScrollableContent && isScrolledFromTop) {
+            container.classList.add('has-scroll-content');
+        } else {
+            container.classList.remove('has-scroll-content');
+        }
+        
+        // Mostrar/ocultar botón de scroll hacia abajo
+        if (hasScrollableContent && !isNearBottom) {
+            scrollButton.classList.remove('hidden');
+        } else {
+            scrollButton.classList.add('hidden');
+        }
+    };
+    
+    // --- FUNCIÓN PARA SCROLL SUAVE AL FINAL ---
+    const scrollToBottom = () => {
+        const container = document.getElementById('chat-container');
+        if (container) {
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    };
+    
+    // --- CONFIGURAR EVENT LISTENERS PARA EL SCROLL ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('chat-container');
+        const scrollButton = document.getElementById('scroll-to-bottom');
+        
+        if (container) {
+            // Actualizar indicador cuando se hace scroll
+            container.addEventListener('scroll', updateScrollIndicator);
+            
+            // Actualizar indicador cuando se redimensiona
+            const resizeObserver = new ResizeObserver(updateScrollIndicator);
+            resizeObserver.observe(container);
+        }
+        
+        if (scrollButton) {
+            // Agregar click listener al botón de scroll
+            scrollButton.addEventListener('click', scrollToBottom);
+        }
+    });
+    
+    // --- FUNCIÓN PARA MEJORAR EL FORMATO DE RESPUESTAS DE IA ---
+    const formatAIResponse = (text) => {
+        let formattedText = text;
+        
+        // PASO 1: Detectar tipo de contenido
+        const isLongResponse = text.length > 800;
+        const isTechnicalResponse = text.includes('**Marco General**') || 
+                                  text.includes('**I.') || 
+                                  text.includes('metodología') ||
+                                  text.includes('**Análisis') ||
+                                  text.includes('implementación') ||
+                                  text.includes('estrategia');
+        
+        // PASO 2: Mejorar títulos principales y secciones (sin emojis, solo negritas)
+        formattedText = formattedText
+            // Títulos principales con números romanos
+            .replace(/\*\*I\.\s*(.*?)\*\*/gi, '**PASO 1: $1**')
+            .replace(/\*\*II\.\s*(.*?)\*\*/gi, '**PASO 2: $1**')
+            .replace(/\*\*III\.\s*(.*?)\*\*/gi, '**PASO 3: $1**')
+            .replace(/\*\*IV\.\s*(.*?)\*\*/gi, '**PASO 4: $1**')
+            .replace(/\*\*V\.\s*(.*?)\*\*/gi, '**PASO 5: $1**')
+            
+            // Títulos con números
+            .replace(/\*\*(\d+)\.\s*(.*?)\*\*/gi, '**$1. $2**')
+            
+            // Títulos generales sin numeración (mantener como están, solo negritas)
+            .replace(/\*\*([A-ZÁÉÍÓÚÑ][^*\n]{3,})\*\*/gi, '**$1**');
+        
+        // PASO 3: Mejorar términos específicos de negocio (sin emojis)
+        formattedText = formattedText
+            .replace(/\*\*Marco General para (.*?)\*\*/gi, '**Marco General para $1**')
+            .replace(/\*\*Descomposición del Plan:\*\*/gi, '**Descomposición del Plan:**')
+            .replace(/\*\*Identificación de (.*?)\*\*/gi, '**Identificación de $1**')
+            .replace(/\*\*Análisis de (.*?)\*\*/gi, '**Análisis de $1**')
+            .replace(/\*\*Brainstorming de (.*?)\*\*/gi, '**Brainstorming de $1**')
+            .replace(/\*\*Evaluación (.*?)\*\*/gi, '**Evaluación $1**')
+            .replace(/\*\*Selección de (.*?)\*\*/gi, '**Selección de $1**')
+            .replace(/\*\*Definición (.*?)\*\*/gi, '**Definición $1**')
+            .replace(/\*\*Revisión (.*?)\*\*/gi, '**Revisión $1**')
+            .replace(/\*\*Implementación (.*?)\*\*/gi, '**Implementación $1**')
+            .replace(/\*\*Monitoreo (.*?)\*\*/gi, '**Monitoreo $1**')
+            .replace(/\*\*Gestión de (.*?)\*\*/gi, '**Gestión de $1**')
+            .replace(/\*\*KPIs:\*\*/gi, '**KPIs:**')
+            .replace(/\*\*ROI:\*\*/gi, '**ROI:**')
+            .replace(/\*\*Cronograma:\*\*/gi, '**Cronograma:**')
+            .replace(/\*\*Presupuesto:\*\*/gi, '**Presupuesto:**')
+            .replace(/\*\*Recursos:\*\*/gi, '**Recursos:**')
+            .replace(/\*\*Riesgos:\*\*/gi, '**Riesgos:**')
+            .replace(/\*\*Oportunidades:\*\*/gi, '**Oportunidades:**');
+        
+        // PASO 4: Mejorar listas y puntos (sin emojis)
+        formattedText = formattedText
+            .replace(/^(\d+)\.\s+(.+)$/gm, '**$1.** $2')
+            .replace(/^[-•]\s+(.+)$/gm, '• $1');
+        
+        // PASO 5: Mejorar palabras clave importantes (sin emojis)
+        formattedText = formattedText
+            .replace(/\b(importante|clave|fundamental|esencial|crítico|vital)\b/gi, '**$1**')
+            .replace(/\b(recuerda|nota|atención|consejo|tip)\b/gi, '**$1**');
+        
+        // PASO 6: Agregar separador y resumen para respuestas largas (sin emojis)
+        if (isLongResponse) {
+            // Agregar separador antes del final
+            if (!formattedText.includes('---')) {
+                formattedText += '\n\n---\n\n';
+            }
+            
+            // Agregar consejo final contextual (sin emojis)
+            if (isTechnicalResponse) {
+                formattedText += '**PUNTO CLAVE**\n\n**Recuerda:** La implementación exitosa requiere planificación detallada y ejecución paso a paso. Comienza con las tareas de mayor impacto.';
+            } else {
+                formattedText += '**RESUMEN**\n\n**Lo más importante:** Enfócate en la acción práctica y mantén la consistencia. Pequeños pasos llevan a grandes resultados.';
+            }
+        }
+        
+        return formattedText;
+    };
+    
+    const updateMessage = (elementId, newText) => {
+        const messageElement = document.getElementById(elementId);
+        if (messageElement) {
+            const textParagraph = messageElement.querySelector('.message-text');
+            if(textParagraph) {
+                // Aplicar formato mejorado para respuestas de IA
+                const isAIMessage = messageElement.closest('.message').classList.contains('user') === false;
+                let processedText = isAIMessage ? formatAIResponse(newText) : newText;
+                
+                // Enhanced markdown to HTML conversion (sin headers, solo negritas)
+                let html = processedText
+                    // Separators
+                    .replace(/^---$/gm, '<hr class="my-4 border-gray-600">')
+                    // Bold and italic
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em class="text-gray-300 italic">$1</em>')
+                    // Inline code
+                    .replace(/`([^`]+)`/g, '<code class="bg-gray-700 text-orange-300 rounded px-2 py-1 text-sm font-mono">$1</code>')
+                    // Code blocks
+                    .replace(/```([\s\S]*?)```/g, '<pre class="bg-gray-800 text-gray-200 rounded-lg p-3 my-3 overflow-x-auto"><code>$1</code></pre>')
+                    // Lists
+                    .replace(/^\*   /gm, '&nbsp;&nbsp;&nbsp;&nbsp;• ')
+                    .replace(/^\* /gm, '• ')
+                    // Quotes
+                    .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-orange-500 pl-4 py-2 bg-gray-800/50 italic text-gray-300 my-2">$1</blockquote>')
+                    // Newlines
+                    .replace(/\n/g, '<br>');
+                
+                textParagraph.innerHTML = html;
+            }
+        }
+        // Scroll to bottom
+        const container = document.getElementById('chat-container');
+        container.scrollTop = container.scrollHeight;
+    };
+
+    const getGeminiResponse = async (prompt) => {
+        console.log('Obteniendo respuesta de Gemini para:', prompt);
+        
+        // === Comprobar si RAG está listo ===
+        if (!isRagReady) {
+            addMessage('El sistema de conocimiento aún no está listo. Por favor, espera un momento.', 'received');
+            return;
+        }
+
+        const thinkingMessageId = addMessage('Buscando en mis documentos...', 'received');
+
+        try {
+            // === Obtener el prompt aumentado desde el manejador RAG ===
+            const augmentedPrompt = await window.ragQuery(prompt);
+            
+            // Actualizar el mensaje de estado
+            const thinkingElement = document.getElementById(thinkingMessageId);
+            if (thinkingElement) {
+                thinkingElement.querySelector('.message-text').textContent = 'Generando respuesta...';
+            }
+
+            const apiKey = window.GEMINI_CONFIG?.apiKey;
+            const baseUrl = window.GEMINI_CONFIG?.baseUrl;
+        const apiUrl = `${baseUrl}?key=${apiKey}`;
+        const payload = {
+                contents: [{ parts: [{ text: augmentedPrompt }] }] // Usamos el prompt aumentado
+        };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            const botResponse = result.candidates?.[0]?.content.parts[0].text || 'Lo siento, no pude procesar tu solicitud.';
+            
+            if (thinkingElement) {
+                thinkingElement.remove();
+            }
+            
+            addMessage(botResponse, 'received');
+            await saveMessageAfterAdd(botResponse, 'received');
+            
+            // Mostrar recomendaciones contextuales después de la respuesta
+            setTimeout(() => {
+                showMessageRecommendations(lastUserMessage);
+            }, 500);
+
+        } catch (error) {
+            console.error("Error al obtener respuesta RAG:", error);
+            const thinkingElement = document.getElementById(thinkingMessageId);
+            if (thinkingElement) {
+                thinkingElement.remove();
+            }
+            addMessage('Ocurrió un error al procesar tu solicitud. Por favor, inténtalo de nuevo.', 'received');
+            await saveMessageAfterAdd('Ocurrió un error al procesar tu solicitud.', 'received');
+        }
+    };
+
+    // Función simplificada para prompts
+    const getPromptWithTone = (prompt) => {
+        return prompt + '\n\nResponde de forma clara, amigable y profesional.';
+    };
+
+
+    // --- LÓGICA DE RECOMENDACIONES DE MENSAJES ---
+    const showMessageRecommendations = (contextMessage = null) => {
+        if (!isRagReady || !window.getMessageRecommendations) {
+            console.log('RAG not ready or recommendations not available');
+            return;
+        }
+
+        // Obtener recomendaciones dinámicamente
+        const recommendations = contextMessage 
+            ? window.getContextualRecommendations(contextMessage, 4)
+            : window.getMessageRecommendations(null, 4);
+
+        if (!recommendations || recommendations.length === 0) {
+            messageRecommendations.classList.add('hidden');
+            return;
+        }
+
+        // Limpiar recomendaciones anteriores
+        recommendationButtons.innerHTML = '';
+
+        // Crear botones de recomendación
+        recommendations.forEach(question => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'recommendation-btn px-4 py-2 text-xs bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors border border-gray-600 whitespace-nowrap';
+            button.textContent = question;
+            button.title = question; // Tooltip con texto completo
+
+            button.addEventListener('click', async () => {
+                console.log('Sending recommended question directly:', question);
+
+                // Ocultar recomendaciones inmediatamente
+                hideMessageRecommendations();
+
+                // Intentar reproducir el video para la pregunta recomendada
+                const videoWasPlayed = playResponseVideo(question);
+                
+                // Si se encontró un video, agregar una notificación en el chat
+                if (videoWasPlayed) {
+                    const videoNotificationId = addMessage('🎥 Reproduciendo respuesta en video...', 'received');
+                    // Remover la notificación después de 3 segundos
+                    setTimeout(() => {
+                        const notificationElement = document.getElementById(videoNotificationId);
+                        if (notificationElement) {
+                            notificationElement.remove();
+                        }
+                    }, 3000);
+                }
+
+                // Verificar que tenemos un chat activo o crear uno nuevo
+                if (!currentChatId && userId) {
+                    console.log('No hay chat actual, creando uno nuevo con pregunta recomendada...');
+                    await createNewChatWithFirstMessage(question, true); // Siempre llamar a Gemini
+                    return;
+                }
+
+                // Guardar el último mensaje para recomendaciones contextuales
+                lastUserMessage = question;
+
+                // Agregar mensaje del usuario directamente
+                const userMessageId = addMessage(question, 'sent');
+                console.log('Recommended question added as user message:', userMessageId);
+
+                // Guardar mensaje
+                await saveMessageAfterAdd(question, 'sent');
+
+                // Siempre enviar a la IA
+                setTimeout(() => {
+                    getGeminiResponse(getPromptWithTone(question));
+                }, 100);
+            });
+
+            recommendationButtons.appendChild(button);
+        });
+
+        // Mostrar el área de recomendaciones
+        messageRecommendations.classList.remove('hidden');
+        console.log('Recommendations shown:', recommendations);
+    };
+
+    // Refrescar recomendaciones al hacer clic en el botón de refrescar
+    if (refreshRecommendationsBtn) {
+        refreshRecommendationsBtn.addEventListener('click', () => {
+            showMessageRecommendations();
+        });
+    }
+
+    // Mostrar recomendaciones automáticamente al cargar el chat si está listo
+    document.addEventListener('DOMContentLoaded', () => {
+        if (isRagReady) {
+            showMessageRecommendations();
+        }
+        // Cargar videos disponibles en el sidebar
+        loadAvailableVideos();
+        
+        // Configurar notificación de respuestas animadas
+        setupAnimatedResponsesNotification();
+        
+        // Inicializar video con el primer idle video del sistema de rotación
+        const botVideo = document.getElementById('bot-video');
+        if (botVideo) {
+            console.log('[VideoRotation] Inicializando sistema de rotación automática');
+            setIdleVideo(); // Usar la nueva función que inicia rotación automática
+            
+            // Agregar listener para confirmar que el video se cargó
+            botVideo.addEventListener('loadeddata', () => {
+                console.log(`[VideoRotation] Video cargado exitosamente: ${botVideo.src}`);
+            });
+            
+            botVideo.addEventListener('error', (e) => {
+                console.error(`[VideoRotation] Error cargando video: ${e.message}`);
+            });
+        }
+        
+        // Atajo de teclado para testing: Shift + R para rotar video idle
+        document.addEventListener('keydown', (e) => {
+            if (e.shiftKey && e.key === 'R') {
+                console.log('[VideoRotation] Atajo activado - forzando rotación');
+                window.forceIdleRotation();
+            }
+        });
+    });
+
+    // --- FUNCIÓN PARA MANEJAR LA NOTIFICACIÓN DE RESPUESTAS ANIMADAS ---
+    const setupAnimatedResponsesNotification = () => {
+        const notification = document.getElementById('animated-responses-notification');
+        const closeBtn = document.getElementById('close-notification');
+        const mainContainer = document.getElementById('main-app-container');
+        
+        if (!notification || !closeBtn) return;
+        
+        // Ajustar padding del contenido principal cuando la notificación esté visible
+        if (mainContainer) {
+            const notificationHeight = notification.offsetHeight;
+            mainContainer.style.paddingTop = `${notificationHeight}px`;
+        }
+        
+        // Manejar el cierre de la notificación
+        closeBtn.addEventListener('click', () => {
+            notification.classList.add('-translate-y-full');
+            
+            // Restaurar padding del contenido principal
+            if (mainContainer) {
+                mainContainer.style.paddingTop = '0px';
+            }
+            
+            // Ocultar completamente después de la animación
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 300);
+        });
+    };
+
+    const hideMessageRecommendations = () => {
+        messageRecommendations.classList.add('hidden');
+    };
+
+    // Función de debug temporal
+    window.debugChatSystem = function() {
+        console.log('=== CHAT SYSTEM DEBUG ===');
+        console.log('isRagReady:', isRagReady);
+        console.log('userId:', userId);
+        console.log('currentChatId:', currentChatId);
+        console.log('messageRecommendations element:', messageRecommendations);
+        console.log('messageRecommendations hidden:', messageRecommendations?.classList.contains('hidden'));
+        console.log('window.getMessageRecommendations available:', typeof window.getMessageRecommendations);
+        console.log('window.initializeRAG available:', typeof window.initializeRAG);
+        console.log('window.ragQuery available:', typeof window.ragQuery);
+        
+        if (window.getMessageRecommendations) {
+            const testRecommendations = window.getMessageRecommendations();
+            console.log('Test recommendations:', testRecommendations);
+        }
+    };
+
+    // Función para forzar recomendaciones
+    window.forceShowRecommendations = function() {
+        console.log('Forcing recommendations display...');
+        if (messageRecommendations) {
+            messageRecommendations.classList.remove('hidden');
+            if (window.getMessageRecommendations) {
+                const recs = window.getMessageRecommendations(null, 4);
+                console.log('Forced recommendations:', recs);
+                
+                recommendationButtons.innerHTML = '';
+                recs.forEach(question => {
+                    const button = document.createElement('button');
+                    button.textContent = question;
+                    button.className = 'recommendation-btn px-4 py-2 text-xs bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors border border-gray-600 whitespace-nowrap';
+                    button.onclick = async () => {
+                        console.log('Sending forced recommendation directly:', question);
+                        hideMessageRecommendations();
+                        
+                        if (!currentChatId && userId) {
+                            await createNewChatWithFirstMessage(question);
+                            return;
+                        }
+                        
+                        lastUserMessage = question;
+                        const userMessageId = addMessage(question, 'sent');
+                        await saveMessageAfterAdd(question, 'sent');
+                        
+                        setTimeout(() => {
+                            getGeminiResponse(getPromptWithTone(question));
+                        }, 100);
+                    };
+                    recommendationButtons.appendChild(button);
+                });
+            }
+        }
+    };
+
+    // Función simplificada para enviar mensajes (backup)
+    window.testSendMessage = function(message) {
+        console.log('Testing message send:', message);
+        if (!message) message = "¿Qué es el 3dE?";
+        
+        // Simular envío de mensaje
+        const userMessageId = addMessage(message, 'sent');
+        console.log('Test message added:', userMessageId);
+        
+        // Llamar directamente a la IA
+        setTimeout(() => {
+            console.log('Calling Gemini for test...');
+            getGeminiResponse(message);
+        }, 100);
+    };
+
+    // Función para probar Enter key
+    window.testEnterKey = function() {
+        console.log('Testing Enter key functionality...');
+        chatInput.value = "Test message";
+        chatInput.focus();
+        
+        // Simular presionar Enter
+        const enterEvent = new KeyboardEvent('keydown', {
+            key: 'Enter',
+            shiftKey: false,
+            bubbles: true
+        });
+        
+        chatInput.dispatchEvent(enterEvent);
+        console.log('Enter key event dispatched');
+    };
+
+    // Función para inicializar el sistema completo después de RAG
+    const initializeChatSystem = () => {
+        console.log('Initializing complete chat system...');
+        
+        // Verificar que todos los elementos estén disponibles
+        console.log('Elements check:');
+        console.log('- messageRecommendations:', !!messageRecommendations);
+        console.log('- recommendationButtons:', !!recommendationButtons);
+        console.log('- chatInput:', !!chatInput);
+        console.log('- chatForm:', !!chatForm);
+        
+        // Mostrar recomendaciones si todo está listo
+        if (isRagReady && window.getMessageRecommendations && messageRecommendations) {
+            console.log('Showing initial recommendations...');
+            showMessageRecommendations();
+        } else {
+            console.warn('Cannot show recommendations - missing dependencies');
+        }
+        
+        // Verificar que el sistema de mensajes funcione
+        console.log('Chat system initialized successfully');
+    };
+
+    // --- Lógica para habilitar/deshabilitar botones de envío ---
+    const updateSubmitButton = (input, button) => {
+        const hasText = input.value.trim().length > 0;
+        button.disabled = !hasText;
+        if (hasText) {
+            button.classList.remove('bg-gray-600', 'cursor-not-allowed');
+            button.classList.add('bg-orange-600', 'hover:bg-orange-500');
+        } else {
+            button.classList.remove('bg-orange-600', 'hover:bg-orange-500');
+            button.classList.add('bg-gray-600', 'cursor-not-allowed');
+        }
+    };
+
+    const welcomeSubmitBtn = welcomeForm.querySelector('button[type="submit"]');
+    const chatSubmitBtn = chatForm.querySelector('button[type="submit"]');
+
+    // Event listeners para los inputs
+    welcomeInput.addEventListener('input', () => {
+        updateSubmitButton(welcomeInput, welcomeSubmitBtn);
+    });
+
+    chatInput.addEventListener('input', () => {
+        updateSubmitButton(chatInput, chatSubmitBtn);
+    });
+
+    // Inicializar estado de los botones
+    updateSubmitButton(welcomeInput, welcomeSubmitBtn);
+    updateSubmitButton(chatInput, chatSubmitBtn);
+
+    // --- ANIMACIÓN DEL TÍTULO POR LETRAS ---
+    function animateTitle() {
+        const title = "3dE";
+        const titleElement = document.getElementById('animated-title');
+        
+        if (titleElement) {
+            titleElement.innerHTML = ''; // Limpiar contenido
+            
+            title.split('').forEach((char, index) => {
+                const span = document.createElement('span');
+                span.textContent = char;
+                span.className = 'animate-letter-rise';
+                span.style.animationDelay = `${0.2 + index * 0.08}s`;
+                titleElement.appendChild(span);
+            });
+        }
+    }
+
+    // Ejecutar la animación del título al cargar la página
+    animateTitle();
+
+    // --- MESSAGE SUBMIT HANDLER ---
+    const handleMessageSubmit = async (event) => {
+        event.preventDefault();
+        const isWelcomeForm = event.target.closest('form') === welcomeForm;
+        const input = isWelcomeForm ? welcomeInput : chatInput;
+        const messageText = input.value.trim();
+
+        if (!messageText) return;
+
+        // Limpiar input inmediatamente
+        input.value = '';
+        updateSubmitButton(input, isWelcomeForm ? welcomeSubmitBtn : chatSubmitBtn);
+
+        // Intentar reproducir el video
+        const videoWasPlayed = playResponseVideo(messageText);
+        
+        // Si se encontró un video, agregar una notificación en el chat
+        if (videoWasPlayed) {
+            const videoNotificationId = addMessage('🎥 Reproduciendo respuesta en video...', 'received');
+            // Remover la notificación después de 3 segundos
+            setTimeout(() => {
+                const notificationElement = document.getElementById(videoNotificationId);
+                if (notificationElement) {
+                    notificationElement.remove();
+                }
+            }, 3000);
+        }
+
+        // Crear o continuar chat y siempre generar respuesta de IA
+        if (!currentChatId && userId) {
+            console.log('No hay chat actual, creando uno nuevo...');
+            await createNewChatWithFirstMessage(messageText, true); // Siempre llamar a Gemini
+        } else {
+            // Agregar mensaje del usuario
+            addMessage(messageText, 'sent');
+            await saveMessageAfterAdd(messageText, 'sent');
+            
+            // Siempre obtener respuesta de IA
+            setTimeout(() => {
+                getGeminiResponse(getPromptWithTone(messageText));
+            }, 200);
+        }
+
+        if (isWelcomeForm) {
+            // Ocultar pantalla de bienvenida y mostrar chat
+            welcomeScreen.classList.add('hidden');
+            chatContainer.classList.remove('hidden');
+            document.getElementById('chat-input-container').classList.remove('hidden');
+            if (videoContainer) videoContainer.classList.remove('hidden');
+        }
+
+        // Guardar el último mensaje para recomendaciones contextuales
+        lastUserMessage = messageText;
+        
+        // Ocultar recomendaciones mientras se procesa
+        hideMessageRecommendations();
+    };
+
+    if (welcomeForm) {
+        welcomeForm.addEventListener('submit', handleMessageSubmit);
+        console.log('Welcome form listener added');
+    } else {
+        console.error('Welcome form not found!');
+    }
+    
+    if (chatForm) {
+        chatForm.addEventListener('submit', handleMessageSubmit);
+        console.log('Chat form listener added');
+    } else {
+        console.error('Chat form not found!');
+    }
+
+    // Event listener para refrescar recomendaciones
+    if (refreshRecommendationsBtn) {
+        refreshRecommendationsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Refreshing recommendations...');
+            
+            if (!isRagReady || !window.getRandomRecommendations) {
+                console.log('RAG not ready or recommendations not available');
+                return;
+            }
+
+            // Generar recomendaciones completamente aleatorias
+            const recommendations = window.getRandomRecommendations(4);
+            
+            if (recommendations.length === 0) {
+                return;
+            }
+
+            // Limpiar recomendaciones anteriores
+            recommendationButtons.innerHTML = '';
+
+            // Crear nuevos botones de recomendación
+            recommendations.forEach(question => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'recommendation-btn px-4 py-2 text-xs bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors border border-gray-600 whitespace-nowrap';
+                button.textContent = question;
+                button.title = question;
+                
+                button.addEventListener('click', async () => {
+                    console.log('Sending refresh recommendation directly:', question);
+                    
+                    // Ocultar recomendaciones inmediatamente
+                    hideMessageRecommendations();
+                    
+                    // Intentar reproducir el video para la pregunta recomendada
+                    const videoWasPlayed = playResponseVideo(question);
+                    
+                    // Si se encontró un video, agregar una notificación en el chat
+                    if (videoWasPlayed) {
+                        const videoNotificationId = addMessage('🎥 Reproduciendo respuesta en video...', 'received');
+                        // Remover la notificación después de 3 segundos
+                        setTimeout(() => {
+                            const notificationElement = document.getElementById(videoNotificationId);
+                            if (notificationElement) {
+                                notificationElement.remove();
+                            }
+                        }, 3000);
+                    }
+                    
+                    // Verificar que tenemos un chat activo o crear uno nuevo
+                    if (!currentChatId && userId) {
+                        console.log('No hay chat actual, creando uno nuevo con pregunta recomendada...');
+                        await createNewChatWithFirstMessage(question, true); // Siempre llamar a Gemini
+                        return;
+                    }
+                    
+                    // Guardar el último mensaje para recomendaciones contextuales
+                    lastUserMessage = question;
+                    
+                    // Agregar mensaje del usuario directamente
+                    const userMessageId = addMessage(question, 'sent');
+                    console.log('Refresh recommendation added as user message:', userMessageId);
+                    
+                    // Guardar mensaje
+                    await saveMessageAfterAdd(question, 'sent');
+                    
+                    // Siempre enviar a la IA
+                    setTimeout(() => {
+                        getGeminiResponse(getPromptWithTone(question));
+                    }, 100);
+                });
+                
+                recommendationButtons.appendChild(button);
+            });
+
+            console.log('Recommendations refreshed with new random questions');
+        });
+    }
+
+    // --- FUNCIONALIDAD DE ENTER EN INPUTS ---
+    welcomeInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (this.value.trim()) {
+          // Enviar el formulario directamente
+          welcomeForm.dispatchEvent(new Event('submit', { bubbles: true }));
+        }
+      }
+    });
+
+    // --- AUTO-RESIZE TEXTAREA ---
+    const textareaEl = document.getElementById('chat-input');
+    if (textareaEl) {
+      textareaEl.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+        
+        // Mostrar/ocultar recomendaciones basándose en el contenido del input
+        if (this.value.trim().length > 0) {
+          hideMessageRecommendations();
+        } else if (isRagReady && this.value.trim().length === 0) {
+          // Mostrar recomendaciones cuando el input está vacío
+          setTimeout(() => showMessageRecommendations(lastUserMessage), 200);
+        }
+      });
+      
+      textareaEl.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          if (this.value.trim()) {
+            // Enviar el formulario directamente
+            chatForm.dispatchEvent(new Event('submit', { bubbles: true }));
+          }
+        }
+      });
+    }
+
+
+
+    // --- Cargar chats del usuario ---
+    async function loadChats() {
+      if (!userId) return;
+      
+      const chatListDiv = document.getElementById('chat-list');
+      
+      // Mostrar indicador de carga
+      chatListDiv.innerHTML = '<li class="p-2 text-gray-400 text-sm">Cargando chats...</li>';
+      
+      try {
+      const chatsRef = collection(db, 'users', userId, 'chats');
+        const q = query(chatsRef, orderBy('lastMessageTime', 'desc'));
+      const snapshot = await getDocs(q);
+        
+      chats = [];
+        chatListDiv.innerHTML = '';
+        
+        if (snapshot.empty) {
+          chatListDiv.innerHTML = '<li class="p-2 text-gray-500 text-sm text-center">No hay chats aún<br/>¡Inicia una conversación!</li>';
+          return;
+        }
+        
+      snapshot.forEach(docSnap => {
+        const chat = { id: docSnap.id, ...docSnap.data() };
+        chats.push(chat);
+        
+          // Truncar último mensaje para preview
+          const lastMessagePreview = chat.lastMessage 
+            ? (chat.lastMessage.length > 40 ? chat.lastMessage.substring(0, 40) + '...' : chat.lastMessage)
+            : 'Sin mensajes';
+          
+        const listItem = document.createElement('li');
+        const item = document.createElement('a');
+        item.href = '#';
+        item.className = 'chat-list-item' + (currentChatId === chat.id ? ' selected' : '');
+        item.onclick = (e) => {
+          e.preventDefault();
+          selectChat(chat.id);
+        };
+        
+        item.innerHTML = `
+          <div class="chat-content">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+              <div class="chat-title-container">
+                <div class="chat-title font-medium">${chat.title || 'Chat sin título'}</div>
+                <div class="chat-preview text-xs text-gray-500 truncate">${lastMessagePreview}</div>
+              </div>
+          </div>
+          <div class="chat-actions">
+              <button class="edit-btn p-1 rounded hover:bg-gray-700" onclick="event.stopPropagation(); editChatTitle('${chat.id}')" title="Editar título">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+            </button>
+              <button class="delete-btn p-1 rounded hover:bg-gray-700 text-red-400" onclick="event.stopPropagation(); deleteChat('${chat.id}')" title="Eliminar chat">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </button>
+          </div>
+        `;
+        
+        listItem.appendChild(item);
+        chatListDiv.appendChild(listItem);
+      });
+        
+        console.log(`Chats cargados: ${chats.length}`);
+      } catch (error) {
+        console.error('Error al cargar chats:', error);
+        chatListDiv.innerHTML = '<li class="p-2 text-red-400 text-sm">Error al cargar chats</li>';
+      }
+    }
+
+    // --- Crear nuevo chat ---
+    async function createNewChat() {
+      console.log('Creando nuevo chat...');
+      if (!userId) {
+        console.log('No hay usuario autenticado');
+        return;
+      }
+      
+      // Cerrar sidebar en móvil al crear nuevo chat
+      if (isMobile()) {
+        sidebar.classList.remove('mobile-open');
+        mobileOverlay.classList.remove('active');
+      }
+      
+      const chatsRef = collection(db, 'users', userId, 'chats');
+      const newChat = {
+        title: 'Nuevo chat',
+        createdAt: serverTimestamp(),
+        lastMessage: '',
+        lastMessageTime: serverTimestamp()
+      };
+      try {
+        const docRef = await addDoc(chatsRef, newChat);
+        console.log('Chat creado con ID:', docRef.id);
+        
+        // Limpia el área de mensajes inmediatamente
+        const messageArea = document.getElementById('message-area');
+        messageArea.innerHTML = '';
+        
+        // Mostrar interfaz de chat y video
+        welcomeScreen.classList.add('hidden');
+        chatContainer.classList.remove('hidden');
+        document.getElementById('chat-input-container').classList.remove('hidden');
+        if (videoContainer) videoContainer.classList.remove('hidden');
+        
+        await loadChats();
+        selectChat(docRef.id);
+      } catch (error) {
+        console.error('Error al crear chat:', error);
+      }
+    }
+
+    // --- Crear nuevo chat con primer mensaje ---
+    async function createNewChatWithFirstMessage(firstMessage, callAI = true) {
+      console.log('Creando nuevo chat con primer mensaje:', firstMessage);
+      if (!userId) {
+        console.log('No hay usuario autenticado');
+        return;
+      }
+      
+      // Crear título inteligente basado en el primer mensaje
+      const chatTitle = generateChatTitle(firstMessage);
+      console.log('Título generado para el chat:', chatTitle);
+      
+      const chatsRef = collection(db, 'users', userId, 'chats');
+      const newChat = {
+        title: chatTitle,
+        createdAt: serverTimestamp(),
+        lastMessage: firstMessage,
+        lastMessageTime: serverTimestamp()
+      };
+      
+      try {
+        const docRef = await addDoc(chatsRef, newChat);
+        console.log('Chat creado con ID:', docRef.id, 'y título:', chatTitle);
+        currentChatId = docRef.id;
+        
+        // Mostrar interfaz de chat y video
+        welcomeScreen.classList.add('hidden');
+        chatContainer.classList.remove('hidden');
+        document.getElementById('chat-input-container').classList.remove('hidden');
+        if (videoContainer) videoContainer.classList.remove('hidden');
+
+        // Agregar el primer mensaje
+        addMessage(firstMessage, 'sent');
+        
+        // Guardar el primer mensaje
+        await saveMessageToChat(firstMessage, 'user');
+        
+        // Actualizar lista de chats
+        await loadChats();
+        
+        // Asegurar que el chat recién creado esté seleccionado visualmente
+        setTimeout(() => {
+          const chatElements = document.querySelectorAll('.chat-list-item');
+          chatElements.forEach(el => el.classList.remove('selected'));
+          const newChatElement = Array.from(chatElements).find(el => 
+            el.onclick && el.onclick.toString().includes(docRef.id)
+          );
+          if (newChatElement) {
+            newChatElement.classList.add('selected');
+          }
+        }, 100);
+        
+        // Limpiar input
+        const input = document.getElementById('welcome-input') || document.getElementById('chat-input');
+        if (input) input.value = '';
+        
+        // Enviar a la IA solo si se indica
+        if (callAI) {
+            setTimeout(() => {
+                getGeminiResponse(getPromptWithTone(firstMessage));
+            }, 200);
+        }
+        
+      } catch (error) {
+        console.error('Error al crear chat con primer mensaje:', error);
+      }
+    }
+
+    // --- Generar título inteligente para el chat ---
+    function generateChatTitle(message) {
+      // Limpiar el mensaje
+      let cleanMessage = message.trim();
+      
+      // Remover caracteres especiales del inicio y fin
+      cleanMessage = cleanMessage.replace(/^[¿?¡!]+|[¿?¡!.]+$/g, '');
+      
+      // Si el mensaje es muy corto, usarlo completo
+      if (cleanMessage.length <= 25) {
+        return cleanMessage.charAt(0).toUpperCase() + cleanMessage.slice(1);
+      }
+      
+      // Para mensajes largos, tomar las primeras 3-5 palabras significativas
+      const words = cleanMessage.split(' ').filter(word => 
+        word.length > 2 && !['que', 'como', 'donde', 'cuando', 'porque', 'para', 'con', 'por', 'una', 'uno', 'del', 'las', 'los', 'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all'].includes(word.toLowerCase())
+      );
+      
+      // Tomar entre 3-5 palabras dependiendo de la longitud
+      const wordsToTake = words.length >= 4 ? 4 : Math.max(3, words.length);
+      let title = words.slice(0, wordsToTake).join(' ');
+      
+      // Si queda muy corto, usar las primeras 4 palabras originales
+      if (title.length < 10) {
+        title = cleanMessage.split(' ').slice(0, 4).join(' ');
+      }
+      
+      // Capitalizar primera letra
+      title = title.charAt(0).toUpperCase() + title.slice(1);
+      
+      // Limitar longitud total
+      if (title.length > 35) {
+        title = title.substring(0, 32) + '...';
+      }
+      
+      return title || 'Nuevo chat';
+    }
+
+    // Conectar el botón nuevo chat
+    const connectNewChatButton = () => {
+      const newChatBtn = document.getElementById('new-chat-btn');
+      if (newChatBtn) {
+        newChatBtn.onclick = createNewChat;
+        console.log('Botón nuevo chat conectado');
+      } else {
+        console.error('No se encontró el botón nuevo chat');
+      }
+    };
+    
+    // Conectar inmediatamente si el DOM ya está listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', connectNewChatButton);
+    } else {
+      connectNewChatButton();
+    }
+
+    // --- Seleccionar chat y cargar mensajes ---
+    async function selectChat(chatId) {
+      console.log('Seleccionando chat:', chatId);
+      currentChatId = chatId;
+      
+      // Cerrar sidebar en móvil al seleccionar chat
+      if (isMobile()) {
+        sidebar.classList.remove('mobile-open');
+        mobileOverlay.classList.remove('active');
+      }
+      
+      // Limpia el área de mensajes
+      const messageArea = document.getElementById('message-area');
+      messageArea.innerHTML = '';
+      
+      // Actualiza selección visual
+      document.querySelectorAll('.chat-list-item').forEach(el => el.classList.remove('selected'));
+      const selected = Array.from(document.querySelectorAll('.chat-list-item')).find(el => 
+        el.onclick && el.onclick.toString().includes(chatId)
+      );
+      if (selected) selected.classList.add('selected');
+      
+      // Actualiza título del chat en el header
+      const chatTitle = document.getElementById('chat-title');
+      const chat = chats.find(c => c.id === chatId);
+      if (chatTitle && chat) {
+        chatTitle.textContent = chat.title || 'Chat sin título';
+      }
+      
+      // Mostrar chat container si está oculto
+      const chatContainer = document.getElementById('chat-container');
+      const inputContainer = document.getElementById('chat-input-container');
+      const welcomeScreen = document.getElementById('welcome-screen');
+      
+      if (chatContainer.classList.contains('hidden')) {
+        welcomeScreen.classList.add('hidden');
+        chatContainer.classList.remove('hidden');
+        inputContainer.classList.remove('hidden');
+        if (videoContainer) videoContainer.classList.remove('hidden');
+      }
+      
+      // Carga mensajes
+      await loadMessages(chatId);
+      
+      // Mostrar recomendaciones después de cargar el chat
+      setTimeout(() => {
+          if (messageRecommendations) {
+              messageRecommendations.classList.remove('hidden');
+              showMessageRecommendations();
+          }
+      }, 300);
+    }
+
+    // --- Cargar mensajes de un chat ---
+    async function loadMessages(chatId) {
+      const messageArea = document.getElementById('message-area');
+      messageArea.innerHTML = '';
+      if (!userId || !chatId) return;
+      const messagesRef = collection(db, 'users', userId, 'chats', chatId, 'messages');
+      const q = query(messagesRef, orderBy('timestamp', 'asc'));
+      const snapshot = await getDocs(q);
+      snapshot.forEach(docSnap => {
+        const msg = docSnap.data();
+        const messageType = msg.sender === 'user' ? 'sent' : 'received';
+        console.log(`Loading message: sender="${msg.sender}", type="${messageType}", text="${msg.text.substring(0, 50)}..."`);
+        addMessage(msg.text, messageType);
+      });
+    }
+
+    // --- Guardar mensaje en el chat actual ---
+    async function saveMessageToChat(text, sender) {
+      if (!userId || !currentChatId) return;
+      
+      try {
+        // Guardar el mensaje
+      const messagesRef = collection(db, 'users', userId, 'chats', currentChatId, 'messages');
+      await addDoc(messagesRef, {
+        text,
+        sender,
+        timestamp: serverTimestamp()
+      });
+        
+        // Actualizar último mensaje del chat
+        const chatRef = doc(db, 'users', userId, 'chats', currentChatId);
+        await updateDoc(chatRef, {
+          lastMessage: text,
+          lastMessageTime: serverTimestamp()
+        });
+        
+        // Recargar chats para actualizar el orden y preview
+        if (sender === 'bot') {
+          await loadChats();
+        }
+        
+        console.log('Mensaje guardado y chat actualizado');
+      } catch (error) {
+        console.error('Error al guardar mensaje:', error);
+      }
+    }
+
+    // --- Función mejorada para guardar mensajes ---
+    const saveMessageAfterAdd = async (text, type) => {
+      if (!currentChatId || !userId) {
+        console.warn('Cannot save message: missing chatId or userId');
+        return;
+      }
+      
+      try {
+        const sender = type === 'sent' ? 'user' : 'bot';
+        console.log(`Saving message: ${sender} - ${text.substring(0, 50)}...`);
+        await saveMessageToChat(text, sender);
+        console.log('Message saved successfully');
+      } catch (error) {
+        console.error('Error saving message:', error);
+      }
+    };
+
+    // --- Funciones adicionales para los botones de chat ---
+    window.editChatTitle = async function(chatId) {
+      const chat = chats.find(c => c.id === chatId);
+      if (chat) {
+        const newTitle = prompt('Nuevo título:', chat.title || 'Chat sin título');
+        if (newTitle && newTitle.trim() && newTitle !== chat.title) {
+          try {
+            const chatRef = doc(db, 'users', userId, 'chats', chatId);
+            await updateDoc(chatRef, {
+              title: newTitle.trim()
+            });
+            console.log('Título del chat actualizado');
+            
+            // Recargar chats para mostrar el cambio
+            await loadChats();
+            
+            // Si es el chat actual, actualizar el título en el header
+            if (currentChatId === chatId) {
+              const chatTitle = document.getElementById('chat-title');
+              if (chatTitle) {
+                chatTitle.textContent = newTitle.trim();
+              }
+            }
+          } catch (error) {
+            console.error('Error al actualizar título del chat:', error);
+            alert('Error al actualizar el título del chat');
+          }
+        }
+      }
+    };
+
+    // Función para mostrar el modal de eliminación
+    window.deleteChat = function(chatId) {
+      console.log('deleteChat llamada con chatId:', chatId);
+      if (!chatId) {
+        console.error('deleteChat: chatId no válido');
+        return;
+      }
+      
+      const chat = chats.find(c => c.id === chatId);
+      const chatTitle = chat ? chat.title : 'Chat sin título';
+      console.log('Mostrando modal para eliminar chat:', chatTitle, 'ID:', chatId);
+      showDeleteModal(chatId, chatTitle);
+    };
+    
+    // Función que realmente elimina el chat (llamada desde el modal)
+    const performDeleteChat = async function(chatId) {
+      try {
+        // Validar que tenemos un chatId válido
+        if (!chatId || !userId) {
+          console.error('Error: chatId o userId no válido', { chatId, userId });
+          throw new Error('ID de chat o usuario no válido');
+        }
+        
+        console.log('Eliminando chat:', chatId);
+        
+        // Agregar efecto de loading al botón
+        const confirmBtn = document.getElementById('delete-confirm-btn');
+        const originalHTML = confirmBtn.innerHTML;
+        confirmBtn.innerHTML = `
+          <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Eliminando...
+        `;
+        confirmBtn.disabled = true;
+        
+        // Eliminar todos los mensajes del chat primero
+        const messagesRef = collection(db, 'users', userId, 'chats', chatId, 'messages');
+        const messagesSnapshot = await getDocs(messagesRef);
+        
+        // Eliminar mensajes en lotes
+        const deletePromises = messagesSnapshot.docs.map(messageDoc => 
+          deleteDoc(messageDoc.ref)
+        );
+        await Promise.all(deletePromises);
+        
+        // Eliminar el chat
+        const chatRef = doc(db, 'users', userId, 'chats', chatId);
+        await deleteDoc(chatRef);
+        
+        console.log('Chat eliminado exitosamente');
+        
+        // Si era el chat actual, limpiar la vista
+        if (currentChatId === chatId) {
+          currentChatId = null;
+          const messageArea = document.getElementById('message-area');
+          messageArea.innerHTML = '';
+          
+          // Mostrar pantalla de bienvenida si no hay otros chats
+          if (chats.length <= 1) {
+            document.getElementById('welcome-screen').classList.remove('hidden');
+            document.getElementById('chat-container').classList.add('hidden');
+            document.getElementById('chat-input-container').classList.add('hidden');
+          }
+        }
+        
+        // Recargar lista de chats
+        await loadChats();
+        
+        // Si hay otros chats, seleccionar el primero
+        if (chats.length > 0 && currentChatId === null) {
+          selectChat(chats[0].id);
+        }
+        
+        // Restaurar botón
+        confirmBtn.innerHTML = originalHTML;
+        confirmBtn.disabled = false;
+        
+      } catch (error) {
+        console.error('Error al eliminar chat:', error);
+        
+        // Mostrar error en el modal
+        const modal = document.getElementById('delete-modal');
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message text-red-400 text-sm mt-2';
+        errorDiv.textContent = 'Error al eliminar el chat. Inténtalo de nuevo.';
+        modal.querySelector('.delete-modal-details').appendChild(errorDiv);
+        
+        // Restaurar botón
+        const confirmBtn = document.getElementById('delete-confirm-btn');
+        confirmBtn.innerHTML = `
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          Eliminar
+        `;
+        confirmBtn.disabled = false;
+        
+        // Remover mensaje de error después de 3 segundos
+        setTimeout(() => {
+          const errorMessage = modal.querySelector('.error-message');
+          if (errorMessage) {
+            errorMessage.remove();
+          }
+        }, 3000);
+      }
+    };
+
+    // --- FUNCIONES DEL MODAL DE ELIMINACIÓN ---
+    let pendingDeleteChatId = null;
+    let modalListenersConfigured = false;
+    
+    const showDeleteModal = (chatId, chatTitle) => {
+        console.log('showDeleteModal llamada con chatId:', chatId, 'chatTitle:', chatTitle);
+        
+        if (!chatId) {
+            console.error('showDeleteModal: chatId no válido');
+            return;
+        }
+        
+        pendingDeleteChatId = chatId;
+        console.log('pendingDeleteChatId asignado:', pendingDeleteChatId);
+        
+        const modal = document.getElementById('delete-modal');
+        const chatTitleElement = document.getElementById('delete-chat-title');
+        
+        // Configurar event listeners solo la primera vez
+        if (!modalListenersConfigured) {
+            setupModalEventListeners();
+            modalListenersConfigured = true;
+        }
+        
+        // Actualizar el título del chat en el modal
+        chatTitleElement.textContent = chatTitle || 'Chat sin título';
+        
+        // Mostrar modal
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.add('show'), 10);
+        
+        // Prevenir scroll del body
+        document.body.style.overflow = 'hidden';
+    };
+    
+    const hideDeleteModal = () => {
+        console.log('Ocultando modal de eliminación');
+        const modal = document.getElementById('delete-modal');
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            
+            // Limpiar cualquier mensaje de error
+            const errorMessage = modal.querySelector('.error-message');
+            if (errorMessage) {
+                errorMessage.remove();
+            }
+        }, 300);
+        
+        console.log('Limpiando pendingDeleteChatId:', pendingDeleteChatId);
+        pendingDeleteChatId = null;
+    };
+    
+    // Función para configurar los event listeners del modal (se ejecuta cuando el DOM esté listo)
+    const setupModalEventListeners = () => {
+        console.log('Configurando event listeners del modal...');
+        
+        const cancelBtn = document.getElementById('delete-cancel-btn');
+        const confirmBtn = document.getElementById('delete-confirm-btn');
+        const modal = document.getElementById('delete-modal');
+        
+        if (cancelBtn && confirmBtn && modal) {
+            // Event listeners para el modal
+            cancelBtn.addEventListener('click', hideDeleteModal);
+            
+            confirmBtn.addEventListener('click', async () => {
+                console.log('Botón confirmar clickeado, pendingDeleteChatId:', pendingDeleteChatId);
+                if (pendingDeleteChatId) {
+                    console.log('Procediendo a eliminar chat con ID:', pendingDeleteChatId);
+                    await performDeleteChat(pendingDeleteChatId);
+                    hideDeleteModal();
+                } else {
+                    console.error('No hay chatId pendiente para eliminar');
+                    hideDeleteModal();
+                }
+            });
+            
+            // Cerrar modal al hacer click en el overlay
+            modal.addEventListener('click', (e) => {
+                if (e.target.id === 'delete-modal') {
+                    hideDeleteModal();
+                }
+            });
+            
+            // Cerrar modal con tecla Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    hideDeleteModal();
+                }
+            });
+            
+            console.log('Event listeners del modal configurados correctamente');
+        } else {
+            console.error('No se encontraron los elementos del modal');
+        }
+    };
+
+
+</script>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div id="delete-modal" class="delete-modal-overlay hidden">
+    <div class="delete-modal-container">
+        <div class="delete-modal-content">
+            <!-- Icono de advertencia -->
+            <div class="delete-modal-icon">
+                <svg class="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+            </div>
+            
+            <!-- Título -->
+            <h3 class="delete-modal-title">
+                ¿Eliminar este chat?
+            </h3>
+            
+            <!-- Mensaje -->
+            <p class="delete-modal-message">
+                Esta acción no se puede deshacer. Se eliminará permanentemente el chat y todos sus mensajes.
+            </p>
+            
+            <!-- Detalles del chat -->
+            <div class="delete-modal-details">
+                <div class="chat-info">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                    <span id="delete-chat-title" class="text-gray-300"></span>
+                </div>
+            </div>
+            
+            <!-- Botones -->
+            <div class="delete-modal-buttons">
+                <button id="delete-cancel-btn" class="delete-btn-cancel">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancelar
+                </button>
+                <button id="delete-confirm-btn" class="delete-btn-confirm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - 3dE 2025 | Tres Días de Emprendimiento</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+    <meta name="theme-color" content="#FF8A00">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
+        }
+        .login-gradient-btn {
+            background: linear-gradient(90deg, #FF8A00 0%, #E52E71 100%);
+            color: #fff;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .login-gradient-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(229, 46, 113, 0.2);
+        }
+        .login-gradient-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        .login-panel {
+            background: rgba(24, 24, 27, 0.95);
+        }
+        .login-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+        }
+        .login-input:focus {
+            border-color: #FF8A00;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.3);
+        }
+        
+        /* Estilos específicos para el selector de universidades */
+        select.login-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+            cursor: pointer;
+        }
+        
+        select.login-input option {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+        }
+        
+        select.login-input option:hover {
+            background: #FF8A00;
+            color: #000;
+        }
+        
+        select.login-input option:checked {
+            background: #FF8A00;
+            color: #000;
+        }
+        
+        select.login-input option:selected {
+            background: #FF8A00;
+            color: #000;
+        }
+        
+        /* Estilos mejorados para visibilidad */
+        select.login-input:focus {
+            border-color: #FF8A00;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.3);
+        }
+        
+        select.login-input:focus option {
+            background: #2a2a2a;
+            color: #ffffff;
+        }
+        
+        select.login-input:focus option:hover {
+            background: #FF8A00 !important;
+            color: #000000 !important;
+        }
+        
+        /* Estilos para navegadores WebKit (Chrome, Safari) */
+        select.login-input::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        select.login-input::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        select.login-input::-webkit-scrollbar-thumb {
+            background: #FF8A00;
+            border-radius: 4px;
+        }
+        
+        select.login-input::-webkit-scrollbar-thumb:hover {
+            background: #E52E71;
+        }
+        
+        /* Estilos adicionales para mejor compatibilidad */
+        select.login-input {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+        
+        /* Para Firefox */
+        @-moz-document url-prefix() {
+            select.login-input option {
+                background: #2a2a2a !important;
+                color: #ffffff !important;
+            }
+            
+            select.login-input option:hover {
+                background: #FF8A00 !important;
+                color: #000000 !important;
+            }
+        }
+        
+        /* Estilos para el campo "Otro" */
+        #other-university-container {
+            transition: all 0.3s ease;
+        }
+        
+        #other-university-container.hidden {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+        }
+        
+        #other-university-container:not(.hidden) {
+            opacity: 1;
+            max-height: 100px;
+            margin-top: 12px;
+        }
+        
+        /* Estilos adicionales para máxima compatibilidad del dropdown */
+        select.login-input {
+            background-color: rgba(42, 42, 42, 0.95) !important;
+            border: 1px solid rgba(255, 138, 0, 0.3) !important;
+            color: #ffffff !important;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Forzar estilos en las opciones para todos los navegadores */
+        select.login-input option {
+            background-color: #2a2a2a !important;
+            color: #ffffff !important;
+            padding: 10px 15px !important;
+            border: none !important;
+            font-size: 14px !important;
+        }
+        
+        select.login-input option:hover,
+        select.login-input option:focus {
+            background-color: #FF8A00 !important;
+            color: #000000 !important;
+        }
+        
+        select.login-input option[value=""] {
+            color: #9ca3af !important;
+            font-style: italic;
+        }
+        
+        /* Para Internet Explorer y Edge legacy */
+        select.login-input::-ms-expand {
+            display: none;
+        }
+        
+        /* Estilos para una animación fluida */
+        #form-panel, #branding-panel {
+            transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.5s ease-in-out,
+                        padding 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .form-section {
+            position: absolute;
+            inset: 0;
+            padding: 2.5rem; /* Corresponde a p-10 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        /* Estado inicial de los formularios ocultos */
+        #register-section, #complete-profile-section {
+            opacity: 0;
+            transform: translateX(30px);
+            pointer-events: none;
+        }
+
+        /* Estado cuando se muestra el registro */
+        #auth-container.is-register-visible #form-panel {
+            width: 100%;
+        }
+        #auth-container.is-register-visible #branding-panel {
+            width: 0%;
+            opacity: 0;
+            padding: 0;
+        }
+        #auth-container.is-register-visible #login-section {
+            opacity: 0;
+            transform: translateX(-30px);
+            pointer-events: none;
+        }
+        #auth-container.is-register-visible #register-section {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+        
+        /* Estado cuando se completa el perfil */
+        #auth-container.is-completing-profile #form-panel {
+            width: 100%;
+        }
+        #auth-container.is-completing-profile #branding-panel {
+            width: 0%;
+            opacity: 0;
+            padding: 0;
+        }
+        #auth-container.is-completing-profile #login-section,
+        #auth-container.is-completing-profile #register-section {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #auth-container.is-completing-profile #complete-profile-section {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+    </style>
+    <!-- Firebase scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <style>
+        a.volver-btn:hover, a.volver-btn:hover span {
+            color: #FF8A00 !important;
+        }
+        a.volver-btn:hover svg {
+            stroke: #FF8A00 !important;
+        }
+        
+        /* Estilos para el logo SVG */
+        .logo-svg {
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(255, 138, 0, 0.2));
+        }
+        
+        .logo-svg:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 4px 8px rgba(255, 138, 0, 0.4));
+        }
+        
+        /* Animación sutil para el gradiente del logo */
+        @keyframes logo-pulse {
+            0%, 100% { 
+                filter: drop-shadow(0 2px 4px rgba(255, 138, 0, 0.2));
+            }
+            50% { 
+                filter: drop-shadow(0 2px 6px rgba(255, 138, 0, 0.4));
+            }
+        }
+        
+        .logo-svg {
+            animation: logo-pulse 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <a href="home.html" class="absolute top-4 left-4 flex items-center gap-2 text-white bg-black bg-opacity-60 px-4 py-2 rounded-lg shadow transition z-20 volver-btn">
+        <svg class="w-5 h-5 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        <span>Volver</span>
+    </a>
+    <div id="auth-container" class="w-full max-w-4xl mx-auto rounded-2xl shadow-2xl flex overflow-hidden">
+        
+        <!-- Panel de Formularios (Contiene Login, Registro y Completar Perfil) -->
+        <div id="form-panel" class="w-full md:w-1/2 login-panel">
+            <div class="relative h-[680px]">
+                
+                <!-- Sección de Login -->
+                <div id="login-section" class="form-section">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="flex items-center">
+                            <svg class="h-10 w-10 mr-2 logo-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="logo-gradient-login" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color: #FF8A00;"></stop>
+                                        <stop offset="100%" style="stop-color: #E52E71;"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M14 20.5V16.5C14 15.3954 13.1046 14.5 12 14.5H10.5M3.5 10H7.5C8.60457 10 9.5 9.10457 9.5 8V3.5" stroke="url(#logo-gradient-login)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M3.5 14H7.5C8.60457 14 9.5 14.8954 9.5 16V20.5" stroke="url(#logo-gradient-login)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M14 3.5V7.5C14 8.60457 14.8954 9.5 16 9.5H20.5" stroke="url(#logo-gradient-login)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M20.5 14H16.5C15.3954 14 14.5 14.8954 14.5 16V20.5" stroke="url(#logo-gradient-login)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                
+                                <rect x="10" y="10" width="4" height="4" rx="0.5" stroke="url(#logo-gradient-login)" stroke-width="1.5"></rect>
+                                <path d="M12 10V8" stroke="url(#logo-gradient-login)" stroke-width="1.5" stroke-linecap="round"></path>
+                                <path d="M12 14V16" stroke="url(#logo-gradient-login)" stroke-width="1.5" stroke-linecap="round"></path>
+                                <path d="M10 12H8" stroke="url(#logo-gradient-login)" stroke-width="1.5" stroke-linecap="round"></path>
+                                <path d="M14 12H16" stroke="url(#logo-gradient-login)" stroke-width="1.5" stroke-linecap="round"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-semibold text-white">3dE 2025</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-white mb-2">Bienvenido al 3dE</h2>
+                    <p class="text-gray-400 mb-8">Accede al chat bot con información del evento</p>
+                    <div class="flex gap-3 mb-4">
+                        <button id="google-login-btn" class="flex-1 flex items-center justify-center gap-2 bg-[#18181b] hover:bg-[#232329] text-white font-semibold py-3 rounded-lg transition">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google"> Google
+                        </button>
+                    </div>
+                    <div class="flex items-center my-4">
+                        <span class="flex-1 h-px bg-gray-700"></span>
+                        <span class="px-3 text-gray-500 text-sm">o</span>
+                        <span class="flex-1 h-px bg-gray-700"></span>
+                    </div>
+                    <form id="login-form" class="space-y-4">
+                        <div>
+                            <label for="login-email" class="block text-gray-400 mb-1">Correo electrónico</label>
+                            <input type="email" id="login-email" class="w-full p-3 rounded-lg login-input" required>
+                        </div>
+                        <div>
+                            <label for="login-password" class="block text-gray-400 mb-1">Contraseña</label>
+                            <div class="relative">
+                                <input type="password" id="login-password" class="w-full p-3 pr-12 rounded-lg login-input" required>
+                                <button type="button" id="toggle-login-password" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full login-gradient-btn py-3 rounded-lg transition">Iniciar sesión</button>
+                        <div id="login-error" class="text-red-500 text-center font-semibold h-5"></div>
+                    </form>
+                    <div class="mt-6 text-center text-gray-400">
+                        ¿No tienes cuenta? <a href="#" id="show-register" class="text-orange-400 hover:underline">Regístrate gratis</a>
+                    </div>
+                </div>
+
+                <!-- Sección de Registro -->
+                <div id="register-section" class="form-section">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex items-center">
+                            <svg class="h-10 w-10 mr-2 logo-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="logo-gradient-register" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color: #FF8A00;"></stop>
+                                        <stop offset="100%" style="stop-color: #E52E71;"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M14 20.5V16.5C14 15.3954 13.1046 14.5 12 14.5H10.5M3.5 10H7.5C8.60457 10 9.5 9.10457 9.5 8V3.5" stroke="url(#logo-gradient-register)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M3.5 14H7.5C8.60457 14 9.5 14.8954 9.5 16V20.5" stroke="url(#logo-gradient-register)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M14 3.5V7.5C14 8.60457 14.8954 9.5 16 9.5H20.5" stroke="url(#logo-gradient-register)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M20.5 14H16.5C15.3954 14 14.5 14.8954 14.5 16V20.5" stroke="url(#logo-gradient-register)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                
+                                <rect x="10" y="10" width="4" height="4" rx="0.5" stroke="url(#logo-gradient-register)" stroke-width="1.5"></rect>
+                                <path d="M12 10V8" stroke="url(#logo-gradient-register)" stroke-width="1.5" stroke-linecap="round"></path>
+                                <path d="M12 14V16" stroke="url(#logo-gradient-register)" stroke-width="1.5" stroke-linecap="round"></path>
+                                <path d="M10 12H8" stroke="url(#logo-gradient-register)" stroke-width="1.5" stroke-linecap="round"></path>
+                                <path d="M14 12H16" stroke="url(#logo-gradient-register)" stroke-width="1.5" stroke-linecap="round"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-semibold text-white">3dE 2025</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-white mb-2">Únete al 3dE</h2>
+                    <p class="text-gray-400 mb-6">Crea tu cuenta para acceder al chat bot del evento</p>
+                    <div class="flex gap-3 mb-4">
+                        <button id="google-register-btn" class="flex-1 flex items-center justify-center gap-2 bg-[#18181b] hover:bg-[#232329] text-white font-semibold py-3 rounded-lg transition">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google"> Google
+                        </button>
+                    </div>
+                    <div class="flex items-center my-4">
+                        <span class="flex-1 h-px bg-gray-700"></span>
+                        <span class="px-3 text-gray-500 text-sm">o</span>
+                        <span class="flex-1 h-px bg-gray-700"></span>
+                    </div>
+                    <form id="register-form" class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label for="register-name" class="block text-gray-400 mb-1">Nombre completo</label>
+                                <input type="text" id="register-name" class="w-full p-3 rounded-lg login-input" required>
+                            </div>
+                            <div>
+                                <label for="register-university" class="block text-gray-400 mb-1">Universidad</label>
+                                <select id="register-university" class="w-full p-3 rounded-lg login-input" required>
+                                    <option value="">Selecciona tu universidad</option>
+                                    <option value="Fundación Universitaria Juan N. Corpas">Fundación Universitaria Juan N. Corpas</option>
+                                    <option value="Universidad Nacional de Colombia">Universidad Nacional de Colombia</option>
+                                    <option value="Uniempresarial">Uniempresarial (Fundación Universitaria Empresarial de la CCB)</option>
+                                    <option value="Universidad Externado de Colombia">Universidad Externado de Colombia</option>
+                                    <option value="UNAD">UNAD (Universidad Nacional Abierta y a Distancia)</option>
+                                    <option value="Universidad EAN">Universidad EAN</option>
+                                    <option value="Uniagraria">Uniagraria (Fundación Universitaria Agraria de Colombia)</option>
+                                    <option value="U.D.C.A">U.D.C.A (Universidad de Ciencias Aplicadas y Ambientales)</option>
+                                    <option value="Universidad La Gran Colombia">Universidad La Gran Colombia</option>
+                                    <option value="Fundación Universitaria Compensar">Fundación Universitaria Compensar</option>
+                                    <option value="Universidad del Rosario">Universidad del Rosario</option>
+                                    <option value="Universidad de la Sabana">Universidad de la Sabana</option>
+                                    <option value="Uniminuto">Uniminuto (Corporación Universitaria Minuto de Dios)</option>
+                                    <option value="Fundación Universitaria del Área Andina">Fundación Universitaria del Área Andina</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                            <div id="other-university-container" class="hidden">
+                                <label for="register-other-university" class="block text-gray-400 mb-1">Especifica tu universidad</label>
+                                <input type="text" id="register-other-university" class="w-full p-3 rounded-lg login-input" placeholder="Escribe el nombre de tu universidad">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="register-email" class="block text-gray-400 mb-1">Correo electrónico</label>
+                            <input type="email" id="register-email" class="w-full p-3 rounded-lg login-input" required>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label for="register-password" class="block text-gray-400 mb-1">Contraseña</label>
+                                <div class="relative">
+                                    <input type="password" id="register-password" class="w-full p-3 pr-12 rounded-lg login-input" required>
+                                    <button type="button" id="toggle-register-password" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="register-confirm-password" class="block text-gray-400 mb-1">Confirmar contraseña</label>
+                                <div class="relative">
+                                    <input type="password" id="register-confirm-password" class="w-full p-3 pr-12 rounded-lg login-input" required>
+                                    <button type="button" id="toggle-register-confirm-password" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full login-gradient-btn py-3 rounded-lg transition">Crear cuenta</button>
+                        <div id="register-error" class="text-red-500 text-center font-semibold h-5"></div>
+                    </form>
+                    <div class="mt-4 text-center text-gray-400">
+                        ¿Ya tienes cuenta? <a href="#" id="show-login" class="text-orange-400 hover:underline">Iniciar sesión</a>
+                    </div>
+                </div>
+
+                <!-- Sección para Completar Perfil (tras registro con Google) -->
+                <div id="complete-profile-section" class="form-section">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex items-center">
+                            <svg class="h-10 w-10 mr-2 logo-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="logo-gradient-complete" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color: #FF8A00;"></stop>
+                                        <stop offset="100%" style="stop-color: #E52E71;"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M14 20.5V16.5C14 15.3954 13.1046 14.5 12 14.5H10.5M3.5 10H7.5C8.60457 10 9.5 9.10457 9.5 8V3.5" stroke="url(#logo-gradient-complete)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M3.5 14H7.5C8.60457 14 9.5 14.8954 9.5 16V20.5" stroke="url(#logo-gradient-complete)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M14 3.5V7.5C14 8.60457 14.8954 9.5 16 9.5H20.5" stroke="url(#logo-gradient-complete)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M20.5 14H16.5C15.3954 14 14.5 14.8954 14.5 16V20.5" stroke="url(#logo-gradient-complete)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                
+                                <rect x="10" y="10" width="4" height="4" rx="0.5" stroke="url(#logo-gradient-complete)" stroke-width="1.5"></rect>
+                                <path d="M12 10V8" stroke="url(#logo-gradient-complete)" stroke-width="1.5" stroke-linecap="round"></path>
+                                <path d="M12 14V16" stroke="url(#logo-gradient-complete)" stroke-width="1.5" stroke-linecap="round"></path>
+                                <path d="M10 12H8" stroke="url(#logo-gradient-complete)" stroke-width="1.5" stroke-linecap="round"></path>
+                                <path d="M14 12H16" stroke="url(#logo-gradient-complete)" stroke-width="1.5" stroke-linecap="round"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-semibold text-white">3dE 2025</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-white mb-2">Un último paso...</h2>
+                    <p class="text-gray-400 mb-6">Completa tus datos para acceder al chat bot del evento.</p>
+                    <form id="complete-profile-form" class="space-y-4">
+                        <div>
+                            <label for="complete-name" class="block text-gray-400 mb-1">Nombre completo</label>
+                            <input type="text" id="complete-name" class="w-full p-3 rounded-lg login-input" required>
+                        </div>
+                        <div>
+                            <label for="complete-company" class="block text-gray-400 mb-1">Universidad o institución</label>
+                            <input type="text" id="complete-company" class="w-full p-3 rounded-lg login-input" required>
+                        </div>
+                        <button type="submit" class="w-full login-gradient-btn py-3 rounded-lg transition">Finalizar registro</button>
+                        <div id="complete-profile-error" class="text-red-500 text-center font-semibold h-5"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Branding -->
+        <div id="branding-panel" class="w-1/2 p-10 md:flex flex-col items-center justify-center bg-black bg-opacity-90">
+            <div class="flex items-center justify-center mb-6">
+                <svg class="h-16 w-16 logo-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="logo-gradient-branding" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color: #FF8A00;"></stop>
+                            <stop offset="100%" style="stop-color: #E52E71;"></stop>
+                        </linearGradient>
+                    </defs>
+                    <path d="M14 20.5V16.5C14 15.3954 13.1046 14.5 12 14.5H10.5M3.5 10H7.5C8.60457 10 9.5 9.10457 9.5 8V3.5" stroke="url(#logo-gradient-branding)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M3.5 14H7.5C8.60457 14 9.5 14.8954 9.5 16V20.5" stroke="url(#logo-gradient-branding)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M14 3.5V7.5C14 8.60457 14.8954 9.5 16 9.5H20.5" stroke="url(#logo-gradient-branding)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M20.5 14H16.5C15.3954 14 14.5 14.8954 14.5 16V20.5" stroke="url(#logo-gradient-branding)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    
+                    <rect x="10" y="10" width="4" height="4" rx="0.5" stroke="url(#logo-gradient-branding)" stroke-width="1.5"></rect>
+                    <path d="M12 10V8" stroke="url(#logo-gradient-branding)" stroke-width="1.5" stroke-linecap="round"></path>
+                    <path d="M12 14V16" stroke="url(#logo-gradient-branding)" stroke-width="1.5" stroke-linecap="round"></path>
+                    <path d="M10 12H8" stroke="url(#logo-gradient-branding)" stroke-width="1.5" stroke-linecap="round"></path>
+                    <path d="M14 12H16" stroke="url(#logo-gradient-branding)" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+            </div>
+                            <h2 class="text-3xl font-extrabold text-white mb-2">3dE 2025</h2>
+            <div class="text-gray-400 mb-4">Tres Días de Emprendimiento</div>
+            <p class="text-gray-400 text-center">Bootcamp intensivo de co-creación e innovación para estudiantes universitarios.</p>
+                            <div class="mt-10 text-gray-600 text-xs">&copy; 2025 3dE - Cámara de Comercio de Bogotá</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuración de Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyCgT1jWF9JzLrfj15ed4_wZrJOKLmL3vJ8", // ¡Usa tus propias claves de API!
+                authDomain: "empresa-ai.firebaseapp.com",
+                projectId: "empresa-ai",
+                storageBucket: "empresa-ai.appspot.com",
+                messagingSenderId: "525047010078",
+                appId: "1:525047010078:web:f8f5414def9b0701e26f0f",
+                measurementId: "G-TKKJK5MBYL"
+            };
+
+            // Inicializa Firebase
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+
+            // --- ELEMENTOS DEL DOM ---
+            const authContainer = document.getElementById('auth-container');
+            const showRegisterBtn = document.getElementById('show-register');
+            const showLoginBtn = document.getElementById('show-login');
+            
+            // Formularios
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const completeProfileForm = document.getElementById('complete-profile-form');
+
+            // Botones de Google
+            const googleLoginBtn = document.getElementById('google-login-btn');
+            const googleRegisterBtn = document.getElementById('google-register-btn');
+
+            // Divs de error
+            const loginErrorDiv = document.getElementById('login-error');
+            const registerErrorDiv = document.getElementById('register-error');
+            const completeProfileErrorDiv = document.getElementById('complete-profile-error');
+            
+            // Elementos del selector de universidad
+            const universitySelect = document.getElementById('register-university');
+            const otherUniversityContainer = document.getElementById('other-university-container');
+            const otherUniversityInput = document.getElementById('register-other-university');
+
+            // --- LÓGICA DE TRANSICIÓN DE FORMULARIOS ---
+            showRegisterBtn?.addEventListener('click', (e) => {
+                e.preventDefault();
+                authContainer.classList.add('is-register-visible');
+            });
+            
+            showLoginBtn?.addEventListener('click', (e) => {
+                e.preventDefault();
+                authContainer.classList.remove('is-register-visible');
+            });
+
+            // --- LÓGICA DEL SELECTOR DE UNIVERSIDAD ---
+            universitySelect?.addEventListener('change', (e) => {
+                if (e.target.value === 'Otro') {
+                    otherUniversityContainer.classList.remove('hidden');
+                    otherUniversityInput.required = true;
+                    otherUniversityInput.focus();
+                } else {
+                    otherUniversityContainer.classList.add('hidden');
+                    otherUniversityInput.required = false;
+                    otherUniversityInput.value = '';
+                }
+            });
+
+            function showCompleteProfileForm(user) {
+                authContainer.classList.remove('is-register-visible');
+                authContainer.classList.add('is-completing-profile');
+                if (user.displayName) {
+                    document.getElementById('complete-name').value = user.displayName;
+                }
+            }
+
+            // --- LÓGICA DE AUTENTICACIÓN ---
+
+            // Iniciar sesión con Email y Contraseña
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                loginErrorDiv.textContent = '';
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                try {
+                    const result = await auth.signInWithEmailAndPassword(email, password);
+                    await handleUserRedirect(result.user);
+                } catch (err) {
+                    loginErrorDiv.textContent = 'Credenciales incorrectas. Inténtalo de nuevo.';
+                }
+            });
+
+            // Registro con Email y Contraseña
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                registerErrorDiv.textContent = '';
+                const name = document.getElementById('register-name').value;
+                const universitySelect = document.getElementById('register-university').value;
+                const otherUniversity = document.getElementById('register-other-university').value;
+                const university = universitySelect === 'Otro' ? otherUniversity : universitySelect;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-confirm-password').value;
+
+                if (password !== confirmPassword) {
+                    registerErrorDiv.textContent = 'Las contraseñas no coinciden.';
+                    return;
+                }
+
+                // Validar universidad
+                if (!university || (universitySelect === 'Otro' && !otherUniversity.trim())) {
+                    registerErrorDiv.textContent = 'Por favor selecciona tu universidad o especifícala en el campo "Otro"';
+                    return;
+                }
+                if (password.length < 6) {
+                    registerErrorDiv.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+                    return;
+                }
+
+                try {
+                    const result = await auth.createUserWithEmailAndPassword(email, password);
+                    const user = result.user;
+                    // Guardar datos adicionales en Firestore
+                    await db.collection('users').doc(user.uid).set({
+                        name: name,
+                        company: university,
+                        email: user.email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    window.location.href = 'perfil.html'; // Redirigir al chat
+                } catch (err) {
+                    if (err.code === 'auth/email-already-in-use') {
+                        registerErrorDiv.textContent = 'Este correo ya está registrado.';
+                    } else {
+                        registerErrorDiv.textContent = 'Error al crear la cuenta.';
+                    }
+                }
+            });
+
+            // Iniciar sesión/Registro con Google
+            const handleGoogleSignIn = async () => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                try {
+                    const result = await auth.signInWithPopup(provider);
+                    await handleUserRedirect(result.user, true);
+                } catch (err) {
+                    loginErrorDiv.textContent = 'Error al iniciar sesión con Google.';
+                }
+            };
+
+            googleLoginBtn.addEventListener('click', handleGoogleSignIn);
+            googleRegisterBtn.addEventListener('click', handleGoogleSignIn);
+
+            // Completar Perfil
+            completeProfileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                completeProfileErrorDiv.textContent = '';
+                const user = auth.currentUser;
+                if (!user) {
+                    completeProfileErrorDiv.textContent = 'No se ha encontrado un usuario. Por favor, inicia sesión de nuevo.';
+                    return;
+                }
+                
+                const name = document.getElementById('complete-name').value;
+                const company = document.getElementById('complete-company').value;
+
+                if (!name || !company) {
+                    completeProfileErrorDiv.textContent = 'Por favor, completa todos los campos.';
+                    return;
+                }
+
+                try {
+                    await db.collection('users').doc(user.uid).set({
+                        name: name,
+                        company: company,
+                        email: user.email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    window.location.href = 'perfil.html'; // Redirigir al chat
+                } catch (err) {
+                    completeProfileErrorDiv.textContent = 'Error al guardar tu información.';
+                }
+            });
+
+            // Función para decidir si redirigir o pedir más datos
+            async function handleUserRedirect(user, isGoogleSignIn = false) {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (!userDoc.exists || !userDoc.data().company) {
+                    // Si el documento no existe o no tiene 'company', pedir datos
+                    showCompleteProfileForm(user);
+                } else {
+                    // Si todo está completo, redirigir
+                    window.location.href = 'perfil.html'; // Redirigir al chat
+                }
+            }
+
+            // --- LÓGICA PARA MOSTRAR/OCULTAR CONTRASEÑA ---
+            function setupPasswordToggle(toggleId, inputId) {
+                const toggleBtn = document.getElementById(toggleId);
+                const inputField = document.getElementById(inputId);
+                if (!toggleBtn || !inputField) return;
+
+                toggleBtn.addEventListener('click', () => {
+                    const type = inputField.type === 'password' ? 'text' : 'password';
+                    inputField.type = type;
+                    const svg = toggleBtn.querySelector('svg');
+                    if (type === 'text') {
+                        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+                    } else {
+                        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>';
+                    }
+                });
+            }
+
+            setupPasswordToggle('toggle-login-password', 'login-password');
+            setupPasswordToggle('toggle-register-password', 'register-password');
+            setupPasswordToggle('toggle-register-confirm-password', 'register-confirm-password');
+        });
+    </script>
+</body>
+</html>
