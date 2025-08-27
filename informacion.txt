@@ -195,7 +195,105 @@ Trabajo en equipo
 
 Iniciativa
 
+¡Absolutamente! Entendido. Quieres que toda la información detallada sobre el reto de Schneider Electric se presente como una única respuesta cohesiva, en lugar de estar dividida en varias preguntas.
 
+He reestructurado el archivo informacion.txt para reflejar exactamente eso. He creado una sola pregunta exhaustiva sobre el reto de Schneider Electric (Dexson) que contiene todos los detalles de la ficha, y la he integrado en el flujo lógico del documento.
+
+Aquí tienes la versión final y definitiva. Reemplaza todo el contenido de tu archivo informacion.txt con este bloque de texto consolidado. Esta es la base de conocimiento más completa que podemos construir con los documentos proporcionados.
+
+Información General del Evento 3dE
+P: ¿Qué es el 3dE?
+R: 3dE, o "Tres días de Emprendimiento", es un bootcamp intensivo y presencial enfocado en la co-creación y la innovación. Su metodología simula el ciclo de vida temprano de una startup. Durante tres días, estudiantes de diversas universidades y disciplinas se reúnen en equipos multidisciplinarios para resolver retos reales propuestos por empresas líderes. El objetivo es generar ideas de negocio que sean viables, innovadoras y con potencial de impacto en el mercado.
+
+P: ¿Quién organiza el evento 3dE?
+R: El 3dE 2025 es coorganizado por la Cámara de Comercio de Bogotá (CCB) junto a un consorcio de 14 instituciones de educación superior: Fundación Universitaria Juan N. Corpas, Universidad Nacional de Colombia, Uniempresarial (Fundación Universitaria Empresarial de la CCB), Universidad Externado de Colombia, UNAD (Universidad Nacional Abierta y a Distancia), Universidad EAN, Uniagraria, U.D.C.A, Universidad La Gran Colombia, Fundación Universitaria Compensar, Universidad del Rosario, Universidad de la Sabana, Uniminuto y la Fundación Universitaria del Área Andina.
+
+P: ¿Qué habilidades se promueven en el 3dE?
+R: El 3dE es una experiencia diseñada para que los estudiantes movilicen y fomenten diversas habilidades clave, tales como: Capacidad de Aprender, Inteligencia Emocional, Toma de Decisiones, Ética y Valores, Solución de Problemas, Capacidad de Negociación, Creatividad e Innovación, Adaptabilidad y Flexibilidad, Trabajo en Equipo e Iniciativa.
+
+Participación y Requisitos
+P: ¿Quiénes pueden participar en el 3dE?
+R: Pueden participar estudiantes con matrícula activa en cualquiera de las 14 universidades organizadoras, tanto en programas de pregrado como de posgrado. Es un evento ideal para quienes tienen deseos de emprender pero NO cuentan con una idea de negocio ya definida.
+
+P: ¿Cuáles son los requisitos para participar?
+R: Los requisitos son: Ser mayor de edad, tener domicilio en Bogotá o municipios aledaños, tener matrícula activa en una de las universidades organizadoras, tener total disponibilidad de tiempo durante los tres días del evento, estar dispuesto a trabajar en equipos multidisciplinarios, tener muchas ganas de aprender y llevar sus propios dispositivos (portátil, tablet, etc.).
+
+Logística del Evento
+P: ¿Cuándo y dónde se realizará el 3dE 2025?
+R: El evento se llevará a cabo los días miércoles 27, jueves 28 y viernes 29 de agosto de 2025. El lugar será el Ágora Centro de Convenciones, ubicado en la Calle 24 No 38-71, en Bogotá.
+
+P: ¿Cuál es el horario del evento?
+R: Las actividades inician cada día a las 8:00 a.m. y finalizan a las 5:00 p.m. Es necesario asistir durante la jornada completa.
+
+P: ¿Tiene algún costo participar?
+R: No, la participación en el bootcamp es gratuita para los estudiantes seleccionados.
+
+P: ¿Cómo me puedo inscribir?
+R: Debes realizar una inscripción previa a través del siguiente enlace: https://forms.office.com/r/xA0qePxTRy.
+
+Dinámica, Agenda y Metodología
+P: ¿Cómo es la dinámica del 3dE?
+R: La metodología es de tipo Bootcamp y se divide en tres fases diarias:
+
+DÍA 1 - INNOVA: Se enfoca en la ideación de soluciones para el reto seleccionado, evaluando que sean deseables, factibles y viables.
+
+DÍA 2 - IMPLEMENTA: Los equipos construyen un prototipo de su solución y lo validan con mentores y expertos para mejorarlo.
+
+DÍA 3 - IMPACTA: Se diseña y presenta un "pitch" final ante un jurado para demostrar el potencial de la idea de negocio.
+
+P: ¿Puedes darme la agenda detallada del primer día?
+R: La agenda para el Día 1 - INNOVA (Miércoles 27 de Agosto) es la siguiente: 8:00 a. m: Lanzamiento Gofest; 10:00 a. m: Lanzamiento 3dE; 10:15 a. m: Descripción de la dinámica; 10:30 a. m: Presentación de retos; 11:00 a. m: Formación de equipos; 12:00 p. m: Almuerzo; 1:30 p. m: Explicación de Ideación; 1:40 p. m: Trabajo en equipo; 3:00 p. m: Elevator PITCH; 4:30 p. m: Evaluación; 4:45 p. m: Cierre.
+
+P: ¿Qué se hará durante el segundo día?
+R: El Día 2 - IMPLEMENTA (Jueves 28 de Agosto) se enfoca en prototipado: 8:30 a. m: Cápsula de prototipado; 9:00 a. m: Trabajo en equipo (Prototipo); 10:30 a. m: Cápsula de validación; 11:00 a. m: Validación del prototipo; 12:00 p. m: Almuerzo; 1:30 p. m: Ajustes al prototipo; 3:30 p. m: Elevator PITCH; 5:00 p. m: Evaluación y cierre.
+
+P: ¿En qué consiste el último día?
+R: El Día 3 - IMPACTA (Viernes 29 de Agosto) está dedicado a la presentación: 8:30 a. m: Cápsula de PITCH; 9:00 a. m: Trabajo en equipo (PITCH); 10:00 a. m: Cápsula para mejorar el pitch con IA; 10:30 a. m: Ensayo del PITCH; 12:00 p. m: Almuerzo; 2:00 p. m: Rondas de Elevator PITCH; 4:00 p. m: PITCH Final.
+
+P: ¿Qué son las "cápsulas" que mencionan en la agenda?
+R: Las cápsulas son breves sesiones de formación con herramientas y conocimientos útiles para que los equipos puedan organizar su trabajo y desarrollar sus ideas, prototipos y pitch de manera más efectiva.
+
+P: ¿Habrá acompañamiento durante el evento?
+R: Sí, durante todo el proceso los equipos estarán acompañados por mentores expertos (consultores, empresarios, docentes) que guiarán a los equipos y resolverán sus inquietudes.
+
+Evaluación y Oportunidades
+P: ¿Quiénes evalúan las propuestas?
+R: Un panel de jurados de alto nivel, compuesto por inversionistas, directores de aceleradoras y ejecutivos influyentes del ecosistema de emprendimiento nacional e internacional.
+
+P: ¿Cómo se evalúan los proyectos?
+R: Los criterios son: Encaje Problema-Solución (20%), Viabilidad de Implementación (20%), Desempeño en el Pitch (20%), Coherencia con el Reto (15%), Originalidad (15%) y Formato de la Presentación (10%).
+
+P: ¿Qué premios o reconocimientos se entregan?
+R: Todos los participantes con 80% de asistencia recibirán un certificado digital. Los equipos ganadores reciben "premios-puente", que son oportunidades para integrarse al ecosistema de la CCB, como vinculación a programas de emprendimiento, mentoría especializada y formación continua.
+
+P: Más allá del certificado, ¿qué oportunidades reales existen para los ganadores?
+R: Ganar no es el final, sino el inicio. Los premios son una rampa de acceso para continuar desarrollando el proyecto con respaldo institucional, incluyendo acceso a networking, ruedas de negocios, asesoría post-evento y acceso preferencial a talleres y diplomados.
+
+Retos y Contexto Estratégico
+P: ¿Cuáles son los retos del 3dE 2025?
+R: Los retos son propuestos por tres empresas líderes y se anuncian el primer día. Las empresas son: Corporación Colombiana de Logística (CCL), Comestibles Ricos y Schneider Electric (Dexson).
+
+P: ¿Puedes darme toda la información detallada sobre el reto de Schneider Electric (Dexson)?
+R: Claro, aquí está toda la información sobre el Reto de Schneider Electric - Dexson:
+
+
+Empresa y Marca: El reto es de Schneider Electric, enfocado en su marca Dexson, la cual es líder en soluciones para la conducción, sujeción e identificación de cables (canaletas, accesorios, etc.) para todo tipo de proyectos (residenciales, industriales, datacenters).
+
+Descripción Corta del Reto: Se busca definir y diseñar propuestas innovadoras (productos, servicios o modelos de negocio) para Dexson que estén alineadas a las tendencias del sector eléctrico, con foco en eficiencia, sostenibilidad, experiencia de usuario y generación de nuevos ingresos.
+
+Contexto del Problema: El sector eléctrico demanda soluciones más rápidas de instalar, seguras, sostenibles y estéticas. Factores como la digitalización, la economía circular y el aumento de dispositivos inalámbricos en hogares están cambiando el mercado. El principal desafío para Dexson es competir contra fabricantes locales que ofrecen productos de apariencia similar a un precio mucho menor, aunque sin la misma calidad o certificaciones. El reto es superar esa barrera de precio y reforzar el valor de la marca.
+
+
+Descripción Detallada del Reto: Se debe imaginar, diseñar y justificar una propuesta innovadora para Dexson que pueda implementarse en un plazo de 1 a 3 años. La propuesta debe considerar viabilidad técnica, sostenibilidad, experiencia de usuario y escalabilidad. Los objetivos específicos son: mejorar la eficiencia y seguridad, reducir el impacto ambiental, generar nuevos ingresos y posicionar a Dexson como un referente de innovación.
+
+Beneficiarios de la Solución: La solución puede beneficiar a un amplio rango de usuarios: instaladores eléctricos, constructoras, diseñadores, administradores de datacenters, distribuidores y clientes finales.
+
+Alcance Esperado: Los equipos deben entregar una propuesta clara de producto, servicio o modelo de negocio, con justificación, beneficios, análisis de viabilidad y potencial de escalamiento. Se valorará mucho la presentación de prototipos o conceptos visuales.
+
+
+Restricciones: Las soluciones deben cumplir con las normativas eléctricas vigentes (RETIE, UL), considerar las restricciones de costos para ser competitivas y ser compatibles con el negocio principal de la marca.
+
+Perfil Sugerido de Estudiantes: Se recomienda un equipo multidisciplinario con estudiantes de Diseño Industrial, Ingeniería Industrial, Administración de Empresas, Innovación y Desarrollo de Productos, Ingeniería Mecánica, Eléctrica, Electrónica y afines.
 
 
 

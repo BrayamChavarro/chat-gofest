@@ -317,7 +317,8 @@ window.getMessageRecommendations = function(category = null, count = 4) {
             '¿Cuáles son los requisitos para participar?',
             '¿Cómo es la dinámica del 3dE?',
             '¿Hay algún costo para participar?',
-            '¿Cuáles son los retos del 3dE 2025?'
+            '¿Cuáles son los retos del 3dE 2025?',
+            '¿Puedes darme toda la información detallada sobre el reto de Schneider Electric (Dexson)?'
         ];
         
         // Combinar preguntas populares con algunas aleatorias

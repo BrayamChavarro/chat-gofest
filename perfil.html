@@ -1489,6 +1489,50 @@
             startIdleRotation();
         }
     };
+
+    // Función para reproducir el video de saludo inicial y luego iniciar idle
+    const playWelcomeVideo = () => {
+        const botVideo = document.getElementById('bot-video');
+        const videoStatus = document.getElementById('video-status');
+        
+        if (botVideo) {
+            console.log('[Welcome] Reproduciendo video de saludo inicial');
+            
+            // Configurar video de saludo
+            botVideo.src = 'videos-respuesta/saludo.mp4';
+            botVideo.loop = false;
+            botVideo.muted = false; // El saludo debe escucharse
+            
+            if (videoStatus) {
+                videoStatus.textContent = 'Saludando...';
+            }
+            
+            // Reproducir video de saludo
+            const playPromise = botVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error("[Welcome] Error al reproducir video de saludo:", error);
+                    // Si falla el saludo, ir directamente a idle
+                    setIdleVideo();
+                });
+            }
+            
+            // Cuando termine el saludo, iniciar videos idle
+            const onSaludoEnded = () => {
+                console.log('[Welcome] Video de saludo terminado, iniciando videos idle');
+                botVideo.removeEventListener('ended', onSaludoEnded);
+                
+                if (videoStatus) {
+                    videoStatus.textContent = '3dE';
+                }
+                
+                // Iniciar sistema de videos idle
+                setIdleVideo();
+            };
+            
+            botVideo.addEventListener('ended', onSaludoEnded);
+        }
+    };
     
     // Función para forzar la rotación de video idle (útil para debugging)
     window.forceIdleRotation = () => {
@@ -1808,13 +1852,99 @@
         { question: "apropiarse después", videoSrc: "videos-respuesta/no desarrollo.mp4" },
         { question: "volver a tener mi idea", videoSrc: "videos-respuesta/no desarrollo.mp4" },
         { question: "empresa abandona idea", videoSrc: "videos-respuesta/no desarrollo.mp4" },
-        { question: "no implementan", videoSrc: "videos-respuesta/no desarrollo.mp4" }
+        { question: "no implementan", videoSrc: "videos-respuesta/no desarrollo.mp4" },
+        
+        // Preguntas sobre el reto de Schneider Electric (Dexson) - Videos múltiples
+        { 
+            question: "¿Puedes darme toda la información detallada sobre el reto de Schneider Electric (Dexson)?", 
+            videoSrc: ["videos-respuesta/respuesta 1.mp4", "videos-respuesta/respuesta 2.mp4", "videos-respuesta/respuesta 3.mp4"],
+            isMultiVideo: true 
+        },
+        { 
+            question: "reto schneider electric", 
+            videoSrc: ["videos-respuesta/respuesta 1.mp4", "videos-respuesta/respuesta 2.mp4", "videos-respuesta/respuesta 3.mp4"],
+            isMultiVideo: true 
+        },
+        { 
+            question: "reto dexson", 
+            videoSrc: ["videos-respuesta/respuesta 1.mp4", "videos-respuesta/respuesta 2.mp4", "videos-respuesta/respuesta 3.mp4"],
+            isMultiVideo: true 
+        },
+        { 
+            question: "schneider electric dexson", 
+            videoSrc: ["videos-respuesta/respuesta 1.mp4", "videos-respuesta/respuesta 2.mp4", "videos-respuesta/respuesta 3.mp4"],
+            isMultiVideo: true 
+        },
+        { 
+            question: "información detallada schneider", 
+            videoSrc: ["videos-respuesta/respuesta 1.mp4", "videos-respuesta/respuesta 2.mp4", "videos-respuesta/respuesta 3.mp4"],
+            isMultiVideo: true 
+        }
     ];
 
     const fuseOptions = {
         includeScore: true,
         keys: ['question'],
         threshold: 0.4 // Ajustar este umbral (0.0 es coincidencia exacta, 1.0 es cualquier cosa)
+    };
+
+    // --- FUNCIÓN PARA REPRODUCIR MÚLTIPLES VIDEOS EN SECUENCIA ---
+    const playMultipleVideos = (videoSources, displayName) => {
+        if (!botVideo || !Array.isArray(videoSources) || videoSources.length === 0) return;
+        
+        console.log(`[MultiVideo] Iniciando reproducción de ${videoSources.length} videos para: ${displayName}`);
+        videoStatus.textContent = `Reproduciendo: ${displayName} (1/${videoSources.length})`;
+        
+        // Detener rotación automática durante reproducción
+        stopIdleRotation();
+        
+        let currentVideoIndex = 0;
+        
+        const playNextVideo = () => {
+            if (currentVideoIndex >= videoSources.length) {
+                // Todos los videos han terminado
+                console.log(`[MultiVideo] Secuencia completa para: ${displayName}`);
+                setIdleVideo();
+                videoStatus.textContent = '3dE';
+                return;
+            }
+            
+            const currentVideoSrc = videoSources[currentVideoIndex];
+            console.log(`[MultiVideo] Reproduciendo video ${currentVideoIndex + 1}/${videoSources.length}: ${currentVideoSrc}`);
+            
+            // Actualizar status
+            videoStatus.textContent = `Reproduciendo: ${displayName} (${currentVideoIndex + 1}/${videoSources.length})`;
+            
+            // Configurar video
+            botVideo.src = currentVideoSrc;
+            botVideo.loop = false;
+            botVideo.muted = false;
+            
+            // Reproducir video
+            const playPromise = botVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error(`[MultiVideo] Error al reproducir video ${currentVideoIndex + 1}:`, error);
+                    videoStatus.textContent = 'Error al reproducir video';
+                    // Continuar con el siguiente video en caso de error
+                    currentVideoIndex++;
+                    setTimeout(playNextVideo, 1000);
+                });
+            }
+            
+            // Configurar listener para cuando termine el video actual
+            const onVideoEnded = () => {
+                botVideo.removeEventListener('ended', onVideoEnded);
+                currentVideoIndex++;
+                // Pequeña pausa entre videos
+                setTimeout(playNextVideo, 500);
+            };
+            
+            botVideo.addEventListener('ended', onVideoEnded);
+        };
+        
+        // Iniciar reproducción del primer video
+        playNextVideo();
     };
 
     // --- FUNCIÓN PARA CARGAR VIDEOS DISPONIBLES EN EL SIDEBAR ---
@@ -1826,7 +1956,18 @@
         const uniqueVideos = [];
         const seenVideos = new Set();
 
+        // Agregar entrada especial para el reto de Schneider Electric
+        uniqueVideos.push({
+            name: 'Reto: Schneider Electric (Dexson)',
+            question: '¿Puedes darme toda la información detallada sobre el reto de Schneider Electric (Dexson)?',
+            src: ['videos-respuesta/respuesta 1.mp4', 'videos-respuesta/respuesta 2.mp4', 'videos-respuesta/respuesta 3.mp4'],
+            isMultiVideo: true
+        });
+
         videoQuestions.forEach(item => {
+            // Skip multi-video entries as we handle them separately
+            if (item.isMultiVideo) return;
+            
             if (!seenVideos.has(item.videoSrc)) {
                 seenVideos.add(item.videoSrc);
                 // Extraer nombre limpio del video
@@ -1835,7 +1976,8 @@
                 uniqueVideos.push({
                     name: displayName,
                     question: item.question,
-                    src: item.videoSrc
+                    src: item.videoSrc,
+                    isMultiVideo: false
                 });
             }
         });
@@ -1847,37 +1989,49 @@
         uniqueVideos.forEach(video => {
             const videoItem = document.createElement('div');
             videoItem.className = 'video-item flex items-center gap-2 p-2 rounded hover:bg-gray-800/50 cursor-pointer transition-colors group';
+            
+            // Agregar ícono diferente para videos múltiples
+            const icon = video.isMultiVideo ? 
+                '<div class="w-2 h-2 bg-orange-400 rounded-full flex-shrink-0 group-hover:bg-orange-300"></div><div class="w-2 h-2 bg-orange-400 rounded-full flex-shrink-0 group-hover:bg-orange-300 ml-1"></div><div class="w-2 h-2 bg-orange-400 rounded-full flex-shrink-0 group-hover:bg-orange-300 ml-1"></div>' :
+                '<div class="w-2 h-2 bg-orange-400 rounded-full flex-shrink-0 group-hover:bg-orange-300"></div>';
+            
             videoItem.innerHTML = `
-                <div class="w-2 h-2 bg-orange-400 rounded-full flex-shrink-0 group-hover:bg-orange-300"></div>
+                ${icon}
                 <span class="text-xs text-gray-400 group-hover:text-gray-300 truncate nav-text">${video.name}</span>
             `;
             
             // Hacer clic para reproducir el video
             videoItem.addEventListener('click', () => {
                 if (botVideo) {
-                    console.log(`[Sidebar] Reproduciendo video: ${video.src}`);
-                    videoStatus.textContent = `Reproduciendo: ${video.name}`;
-                    
-                    // Detener rotación automática durante reproducción de respuesta
-                    stopIdleRotation();
-                    
-                    botVideo.src = video.src;
-                    botVideo.loop = false;
-                    botVideo.muted = false;
-                    
-                    const playPromise = botVideo.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch(error => {
-                            console.error("[Sidebar] Error al reproducir video:", error);
-                            videoStatus.textContent = 'Error al reproducir video';
-                        });
+                    if (video.isMultiVideo) {
+                        // Reproducir videos múltiples en secuencia
+                        playMultipleVideos(video.src, video.name);
+                    } else {
+                        // Reproducir video único
+                        console.log(`[Sidebar] Reproduciendo video: ${video.src}`);
+                        videoStatus.textContent = `Reproduciendo: ${video.name}`;
+                        
+                        // Detener rotación automática durante reproducción de respuesta
+                        stopIdleRotation();
+                        
+                        botVideo.src = video.src;
+                        botVideo.loop = false;
+                        botVideo.muted = false;
+                        
+                        const playPromise = botVideo.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                console.error("[Sidebar] Error al reproducir video:", error);
+                                videoStatus.textContent = 'Error al reproducir video';
+                            });
+                        }
+                        
+                        // Restaurar video idle cuando termine
+                        botVideo.addEventListener('ended', () => {
+                            setIdleVideo(); // Usar la nueva función que incluye rotación automática
+                            videoStatus.textContent = '3dE';
+                        }, { once: true });
                     }
-                    
-                    // Restaurar video idle cuando termine
-                    botVideo.addEventListener('ended', () => {
-                        setIdleVideo(); // Usar la nueva función que incluye rotación automática
-                        videoStatus.textContent = '3dE';
-                    }, { once: true });
                 }
             });
 
@@ -1899,33 +2053,43 @@
             if (bestMatch.score < 0.4) { // Umbral de confianza
                 const videoSrc = bestMatch.item.videoSrc;
                 const matchedQuestion = bestMatch.item.question;
-                console.log(`[VideoLogic] ¡Coincidencia encontrada! Pregunta: "${matchedQuestion}", Score: ${bestMatch.score}, Video: ${videoSrc}`);
+                const isMultiVideo = bestMatch.item.isMultiVideo;
+                
+                console.log(`[VideoLogic] ¡Coincidencia encontrada! Pregunta: "${matchedQuestion}", Score: ${bestMatch.score}, Video: ${videoSrc}, MultiVideo: ${isMultiVideo}`);
                 
                 if (videoSrc && botVideo) {
-                    console.log(`[VideoLogic] Reproduciendo video: ${videoSrc}`);
-                    videoStatus.textContent = 'Reproduciendo respuesta en video...';
-                    
-                    // Detener rotación automática durante reproducción de respuesta
-                    stopIdleRotation();
-                    
-                    botVideo.src = videoSrc;
-                    botVideo.loop = false;
-                    botVideo.muted = false;
-                    
-                    const playPromise = botVideo.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch(error => {
-                            console.error("[VideoLogic] Error al intentar reproducir el video:", error);
-                            videoStatus.textContent = 'Error al reproducir video. Habilita el sonido en el navegador.';
-                        });
+                    if (isMultiVideo && Array.isArray(videoSrc)) {
+                        // Reproducir videos múltiples en secuencia
+                        console.log(`[VideoLogic] Reproduciendo secuencia de ${videoSrc.length} videos`);
+                        const displayName = 'Reto Schneider Electric (Dexson)';
+                        playMultipleVideos(videoSrc, displayName);
+                    } else {
+                        // Reproducir video único
+                        console.log(`[VideoLogic] Reproduciendo video: ${videoSrc}`);
+                        videoStatus.textContent = 'Reproduciendo respuesta en video...';
+                        
+                        // Detener rotación automática durante reproducción de respuesta
+                        stopIdleRotation();
+                        
+                        botVideo.src = videoSrc;
+                        botVideo.loop = false;
+                        botVideo.muted = false;
+                        
+                        const playPromise = botVideo.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                console.error("[VideoLogic] Error al intentar reproducir el video:", error);
+                                videoStatus.textContent = 'Error al reproducir video. Habilita el sonido en el navegador.';
+                            });
+                        }
+                        
+                        // Restaurar video idle cuando termine
+                        botVideo.addEventListener('ended', () => {
+                            console.log("[VideoLogic] Video terminado, volviendo al estado idle");
+                            setIdleVideo(); // Usar la nueva función que incluye rotación automática
+                            videoStatus.textContent = '3dE';
+                        }, { once: true });
                     }
-                    
-                    // Restaurar video idle cuando termine
-                    botVideo.addEventListener('ended', () => {
-                        console.log("[VideoLogic] Video terminado, volviendo al estado idle");
-                        setIdleVideo(); // Usar la nueva función que incluye rotación automática
-                        videoStatus.textContent = '3dE';
-                    }, { once: true });
                     
                     return true; // Video encontrado y reproducido
                 }
@@ -2636,11 +2800,11 @@
         // Configurar notificación de respuestas animadas
         setupAnimatedResponsesNotification();
         
-        // Inicializar video con el primer idle video del sistema de rotación
+        // Inicializar video con el saludo de bienvenida, luego videos idle
         const botVideo = document.getElementById('bot-video');
         if (botVideo) {
-            console.log('[VideoRotation] Inicializando sistema de rotación automática');
-            setIdleVideo(); // Usar la nueva función que inicia rotación automática
+            console.log('[VideoRotation] Inicializando con video de saludo');
+            playWelcomeVideo(); // Reproducir saludo primero, luego videos idle
             
             // Agregar listener para confirmar que el video se cargó
             botVideo.addEventListener('loadeddata', () => {

@@ -142,22 +142,38 @@
         
         /* Estilos para el campo "Otro" */
         #other-university-container {
-            transition: all 0.3s ease;
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1;
         }
         
         #other-university-container.hidden {
+            display: none;
             opacity: 0;
-            max-height: 0;
-            overflow: hidden;
         }
         
+        /* Mostrar el campo "otro" cuando esté visible */
         #other-university-container:not(.hidden) {
+            display: block;
             opacity: 1;
-            max-height: 100px;
-            margin-top: 12px;
+            animation: fadeIn 0.3s ease-in;
         }
         
-        /* Estilos adicionales para máxima compatibilidad del dropdown */
+        #company-container {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1;
+        }
+        
+        #company-container.hidden {
+            display: none;
+            opacity: 0;
+        }
+        
+        /* Mostrar el campo "empresa" cuando esté visible */
+        #company-container:not(.hidden) {
+            display: block;
+            opacity: 1;
+            animation: fadeIn 0.3s ease-in;
+        }        /* Estilos adicionales para máxima compatibilidad del dropdown */
         select.login-input {
             background-color: rgba(42, 42, 42, 0.95) !important;
             border: 1px solid rgba(255, 138, 0, 0.3) !important;
@@ -407,9 +423,9 @@
                                 <input type="text" id="register-name" class="w-full p-3 rounded-lg login-input" required>
                             </div>
                             <div>
-                                <label for="register-university" class="block text-gray-400 mb-1">Universidad</label>
+                                <label for="register-university" class="block text-gray-400 mb-1">Universidad o institución</label>
                                 <select id="register-university" class="w-full p-3 rounded-lg login-input" required>
-                                    <option value="">Selecciona tu universidad</option>
+                                    <option value="">Selecciona tu universidad o institución</option>
                                     <option value="Fundación Universitaria Juan N. Corpas">Fundación Universitaria Juan N. Corpas</option>
                                     <option value="Universidad Nacional de Colombia">Universidad Nacional de Colombia</option>
                                     <option value="Uniempresarial">Uniempresarial (Fundación Universitaria Empresarial de la CCB)</option>
@@ -424,12 +440,17 @@
                                     <option value="Universidad de la Sabana">Universidad de la Sabana</option>
                                     <option value="Uniminuto">Uniminuto (Corporación Universitaria Minuto de Dios)</option>
                                     <option value="Fundación Universitaria del Área Andina">Fundación Universitaria del Área Andina</option>
-                                    <option value="Otro">Otro</option>
+                                    <option value="Empresa">Empresa</option>
+                                    <option value="Otra Universidad">Otra Universidad</option>
                                 </select>
                             </div>
                             <div id="other-university-container" class="hidden">
                                 <label for="register-other-university" class="block text-gray-400 mb-1">Especifica tu universidad</label>
                                 <input type="text" id="register-other-university" class="w-full p-3 rounded-lg login-input" placeholder="Escribe el nombre de tu universidad">
+                            </div>
+                            <div id="company-container" class="hidden">
+                                <label for="register-company-name" class="block text-gray-400 mb-1">Nombre de la empresa</label>
+                                <input type="text" id="register-company-name" class="w-full p-3 rounded-lg login-input" placeholder="Escribe el nombre de tu empresa">
                             </div>
                         </div>
                         <div>
@@ -577,6 +598,8 @@
             const universitySelect = document.getElementById('register-university');
             const otherUniversityContainer = document.getElementById('other-university-container');
             const otherUniversityInput = document.getElementById('register-other-university');
+            const companyContainer = document.getElementById('company-container');
+            const companyInput = document.getElementById('register-company-name');
 
             // --- LÓGICA DE TRANSICIÓN DE FORMULARIOS ---
             showRegisterBtn?.addEventListener('click', (e) => {
@@ -591,14 +614,25 @@
 
             // --- LÓGICA DEL SELECTOR DE UNIVERSIDAD ---
             universitySelect?.addEventListener('change', (e) => {
-                if (e.target.value === 'Otro') {
+                const selectedValue = e.target.value;
+                
+                // Ocultar todos los campos adicionales primero
+                otherUniversityContainer.classList.add('hidden');
+                companyContainer.classList.add('hidden');
+                otherUniversityInput.required = false;
+                companyInput.required = false;
+                otherUniversityInput.value = '';
+                companyInput.value = '';
+                
+                // Mostrar el campo correspondiente según la selección
+                if (selectedValue === 'Otra Universidad') {
                     otherUniversityContainer.classList.remove('hidden');
                     otherUniversityInput.required = true;
                     otherUniversityInput.focus();
-                } else {
-                    otherUniversityContainer.classList.add('hidden');
-                    otherUniversityInput.required = false;
-                    otherUniversityInput.value = '';
+                } else if (selectedValue === 'Empresa') {
+                    companyContainer.classList.remove('hidden');
+                    companyInput.required = true;
+                    companyInput.focus();
                 }
             });
 
@@ -633,7 +667,18 @@
                 const name = document.getElementById('register-name').value;
                 const universitySelect = document.getElementById('register-university').value;
                 const otherUniversity = document.getElementById('register-other-university').value;
-                const university = universitySelect === 'Otro' ? otherUniversity : universitySelect;
+                const companyName = document.getElementById('register-company-name').value;
+                
+                // Determinar el valor final de la institución/empresa
+                let institution = '';
+                if (universitySelect === 'Otra Universidad') {
+                    institution = otherUniversity;
+                } else if (universitySelect === 'Empresa') {
+                    institution = companyName;
+                } else {
+                    institution = universitySelect;
+                }
+                
                 const email = document.getElementById('register-email').value;
                 const password = document.getElementById('register-password').value;
                 const confirmPassword = document.getElementById('register-confirm-password').value;
@@ -643,9 +688,11 @@
                     return;
                 }
 
-                // Validar universidad
-                if (!university || (universitySelect === 'Otro' && !otherUniversity.trim())) {
-                    registerErrorDiv.textContent = 'Por favor selecciona tu universidad o especifícala en el campo "Otro"';
+                // Validar institución/empresa
+                if (!institution || 
+                    (universitySelect === 'Otra Universidad' && !otherUniversity.trim()) ||
+                    (universitySelect === 'Empresa' && !companyName.trim())) {
+                    registerErrorDiv.textContent = 'Por favor selecciona tu universidad/institución o especifícala en el campo correspondiente';
                     return;
                 }
                 if (password.length < 6) {
@@ -659,7 +706,7 @@
                     // Guardar datos adicionales en Firestore
                     await db.collection('users').doc(user.uid).set({
                         name: name,
-                        company: university,
+                        company: institution,
                         email: user.email,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
