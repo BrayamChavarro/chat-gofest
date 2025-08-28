@@ -2783,7 +2783,11 @@
             button.title = question; // Tooltip con texto completo
 
             button.addEventListener('click', async () => {
-                console.log('Sending recommended question directly:', question);
+                console.log('=== SUGGESTION CLICK DEBUG ===');
+                console.log('Original question from suggestion:', question);
+                console.log('Question length:', question.length);
+                console.log('Question includes CCL:', question.includes('CCL'));
+                console.log('Question includes Corporación:', question.includes('Corporación'));
 
                 // Ocultar recomendaciones inmediatamente
                 hideMessageRecommendations();
@@ -2820,9 +2824,15 @@
                 // Guardar mensaje
                 await saveMessageAfterAdd(question, 'sent');
 
+                // DEBUGGING: Verificar el prompt antes de enviarlo
+                const promptWithTone = getPromptWithTone(question);
+                console.log('=== PROMPT DEBUG ===');
+                console.log('Prompt with tone:', promptWithTone);
+                console.log('About to call getGeminiResponse with:', promptWithTone);
+
                 // Siempre enviar a la IA
                 setTimeout(() => {
-                    getGeminiResponse(getPromptWithTone(question));
+                    getGeminiResponse(promptWithTone);
                 }, 100);
             });
 
@@ -3110,8 +3120,19 @@
             await saveMessageAfterAdd(messageText, 'sent');
             
             // Siempre obtener respuesta de IA
+            console.log('=== MANUAL INPUT DEBUG ===');
+            console.log('Manual input messageText:', messageText);
+            console.log('Message length:', messageText.length);
+            console.log('Message includes CCL:', messageText.includes('CCL'));
+            console.log('Message includes Corporación:', messageText.includes('Corporación'));
+            
+            const promptWithTone = getPromptWithTone(messageText);
+            console.log('=== MANUAL PROMPT DEBUG ===');
+            console.log('Prompt with tone:', promptWithTone);
+            console.log('About to call getGeminiResponse with:', promptWithTone);
+            
             setTimeout(() => {
-                getGeminiResponse(getPromptWithTone(messageText));
+                getGeminiResponse(promptWithTone);
             }, 200);
         }
 
@@ -3174,7 +3195,11 @@
                 button.title = question;
                 
                 button.addEventListener('click', async () => {
-                    console.log('Sending refresh recommendation directly:', question);
+                    console.log('=== REFRESH SUGGESTION CLICK DEBUG ===');
+                    console.log('Original question from refresh suggestion:', question);
+                    console.log('Question length:', question.length);
+                    console.log('Question includes CCL:', question.includes('CCL'));
+                    console.log('Question includes Corporación:', question.includes('Corporación'));
                     
                     // Ocultar recomendaciones inmediatamente
                     hideMessageRecommendations();
@@ -3211,9 +3236,15 @@
                     // Guardar mensaje
                     await saveMessageAfterAdd(question, 'sent');
                     
+                    // DEBUGGING: Verificar el prompt antes de enviarlo
+                    const promptWithTone = getPromptWithTone(question);
+                    console.log('=== REFRESH PROMPT DEBUG ===');
+                    console.log('Prompt with tone:', promptWithTone);
+                    console.log('About to call getGeminiResponse with:', promptWithTone);
+                    
                     // Siempre enviar a la IA
                     setTimeout(() => {
-                        getGeminiResponse(getPromptWithTone(question));
+                        getGeminiResponse(promptWithTone);
                     }, 100);
                 });
                 
