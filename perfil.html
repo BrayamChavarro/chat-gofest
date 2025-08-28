@@ -1609,6 +1609,11 @@
         { question: "empresas patrocinadoras", videoSrc: "videos-respuesta/retos.mp4" },
         { question: "corporacion colombiana de logistica", videoSrc: "videos-respuesta/retos.mp4" },
         { question: "comestibles ricos", videoSrc: "videos-respuesta/retos.mp4" },
+    { question: "reto 2", videoSrc: "videos-respuesta/retos.mp4" },
+    { question: "reto dos", videoSrc: "videos-respuesta/retos.mp4" },
+    { question: "informacion reto 2", videoSrc: "videos-respuesta/retos.mp4" },
+    { question: "detalle reto 2", videoSrc: "videos-respuesta/retos.mp4" },
+    { question: "reto comestibles ricos", videoSrc: "videos-respuesta/retos.mp4" },
         { question: "schneider electric", videoSrc: "videos-respuesta/retos.mp4" },
         { question: "dexson", videoSrc: "videos-respuesta/retos.mp4" },
         { question: "ccl", videoSrc: "videos-respuesta/retos.mp4" },
@@ -1879,7 +1884,48 @@
             question: "información detallada schneider", 
             videoSrc: ["videos-respuesta/respuesta 1.mp4", "videos-respuesta/respuesta 2.mp4", "videos-respuesta/respuesta 3.mp4"],
             isMultiVideo: true 
-        }
+        },
+        
+        // Preguntas sobre agenda detallada
+        { question: "¿Puedes darme la agenda detallada del primer día?", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "agenda primer dia", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "programa primer dia", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "cronograma primer dia", videoSrc: "videos-respuesta/horario.mp4" },
+        { question: "dia 1 innova", videoSrc: "videos-respuesta/horario.mp4" },
+        
+        // Preguntas sobre costos/gratuidad
+        { question: "¿Tiene algún costo participar?", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "¿hay costo para participar?", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "costo participacion", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "es gratis", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "precio del evento", videoSrc: "videos-respuesta/costos.mp4" },
+        { question: "cuanto cuesta", videoSrc: "videos-respuesta/costos.mp4" },
+        
+        // Preguntas sobre evaluación y jurados
+        { question: "¿Quiénes evalúan las propuestas?", videoSrc: "videos-respuesta/jurados.mp4" },
+        { question: "¿Cómo se evalúan los proyectos?", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "criterios de evaluacion", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "como evaluan", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        { question: "ponderaciones", videoSrc: "videos-respuesta/como se evaluan.mp4" },
+        
+        // Preguntas sobre premios
+        { question: "¿Qué premios o reconocimientos se entregan?", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "premios", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "reconocimientos", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "que ganan", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        { question: "certificado", videoSrc: "videos-respuesta/premios o reconocimientos.mp4" },
+        
+        // Preguntas sobre habilidades
+        { question: "¿Qué habilidades se promueven en el 3dE?", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "habilidades promovidas", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "competencias desarrolladas", videoSrc: "videos-respuesta/habilidades.mp4" },
+        { question: "skills", videoSrc: "videos-respuesta/habilidades.mp4" },
+        
+        // Preguntas sobre tipos de retos
+        { question: "¿Qué tipo de retos puedo esperar de las empresas patrocinadoras?", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "tipo de retos", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "ejemplos de retos", videoSrc: "videos-respuesta/tipo de retos.mp4" },
+        { question: "retos empresas", videoSrc: "videos-respuesta/tipo de retos.mp4" }
     ];
 
     const fuseOptions = {
@@ -2632,58 +2678,6 @@
         container.scrollTop = container.scrollHeight;
     };
 
-    // Debug function para testing
-    window.testCCLQuestion = async function() {
-        console.log("=== TESTING CCL QUESTION ===");
-        
-        if (!window.ragQuery) {
-            console.error("RAG no está disponible");
-            return;
-        }
-        
-        const testQuery = "¿Puedes darme toda la información detallada sobre el reto de CCL?";
-        console.log("Testing query:", testQuery);
-        
-        try {
-            const augmentedPrompt = await window.ragQuery(testQuery);
-            console.log("Augmented prompt generated:", augmentedPrompt.substring(0, 500) + "...");
-            
-            // Test specific content search
-            const chunks = window.documentChunks || [];
-            console.log("Total chunks available:", chunks.length);
-            
-            const cclChunks = chunks.filter(chunk => 
-                chunk.toLowerCase().includes('ccl') || 
-                chunk.toLowerCase().includes('corporación colombiana de logística')
-            );
-            console.log("CCL-related chunks found:", cclChunks.length);
-            
-            cclChunks.forEach((chunk, i) => {
-                console.log(`CCL Chunk ${i + 1}:`, chunk.substring(0, 200) + "...");
-            });
-            
-        } catch (error) {
-            console.error("Error testing CCL question:", error);
-        }
-    };
-
-    // Debug function to test RAG initialization
-    window.debugRAG = function() {
-        console.log("=== RAG DEBUG INFO ===");
-        console.log("RAG Ready:", isRagReady);
-        console.log("RAG functions available:");
-        console.log("- ragQuery:", typeof window.ragQuery);
-        console.log("- getMessageRecommendations:", typeof window.getMessageRecommendations);
-        console.log("- initializeRAG:", typeof window.initializeRAG);
-        
-        if (window.documentChunks) {
-            console.log("Document chunks:", window.documentChunks.length);
-        }
-        if (window.availableQuestions) {
-            console.log("Available questions:", window.availableQuestions.length);
-        }
-    };
-
     const getGeminiResponse = async (prompt) => {
         console.log('Obteniendo respuesta de Gemini para:', prompt);
         
@@ -2697,7 +2691,21 @@
 
         try {
             // === Obtener el prompt aumentado desde el manejador RAG ===
-            const augmentedPrompt = await window.ragQuery(prompt);
+            let augmentedPrompt;
+            try {
+                augmentedPrompt = await window.ragQuery(prompt);
+            } catch(ragError) {
+                console.error('Fallo en ragQuery:', ragError);
+                try {
+                    const thinkingElSafe = document.getElementById(thinkingMessageId);
+                    if (thinkingElSafe) {
+                        const mt = thinkingElSafe.querySelector('.message-text');
+                        if (mt) mt.textContent = 'No pude acceder a la base de conocimiento, respondiendo directamente...';
+                    }
+                } catch(_) {}
+                // Fallback simple: usar prompt original
+                augmentedPrompt = prompt + '\n\n(Nota: No se pudo acceder al contexto interno, responde solo con lo que tengas disponible)';
+            }
             
             // Actualizar el mensaje de estado
             const thinkingElement = document.getElementById(thinkingMessageId);
@@ -2707,10 +2715,10 @@
 
             const apiKey = window.GEMINI_CONFIG?.apiKey;
             const baseUrl = window.GEMINI_CONFIG?.baseUrl;
-            const apiUrl = `${baseUrl}?key=${apiKey}`;
-            const payload = {
+        const apiUrl = `${baseUrl}?key=${apiKey}`;
+        const payload = {
                 contents: [{ parts: [{ text: augmentedPrompt }] }] // Usamos el prompt aumentado
-            };
+        };
 
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -2719,11 +2727,16 @@
             });
 
             if (!response.ok) {
-                throw new Error(`API Error: ${response.statusText}`);
+                const errorText = await response.text();
+                console.error('Respuesta de API no OK:', response.status, errorText);
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
             }
 
             const result = await response.json();
-            const botResponse = result.candidates?.[0]?.content.parts[0].text || 'Lo siento, no pude procesar tu solicitud.';
+            let botResponse = result.candidates?.[0]?.content.parts[0].text || 'Lo siento, no pude procesar tu solicitud.';
+            if (!botResponse || botResponse.trim().length === 0) {
+                botResponse = 'Lo siento, la respuesta llegó vacía desde el modelo.';
+            }
             
             if (thinkingElement) {
                 thinkingElement.remove();
@@ -2783,11 +2796,7 @@
             button.title = question; // Tooltip con texto completo
 
             button.addEventListener('click', async () => {
-                console.log('=== SUGGESTION CLICK DEBUG ===');
-                console.log('Original question from suggestion:', question);
-                console.log('Question length:', question.length);
-                console.log('Question includes CCL:', question.includes('CCL'));
-                console.log('Question includes Corporación:', question.includes('Corporación'));
+                console.log('Sending recommended question directly:', question);
 
                 // Ocultar recomendaciones inmediatamente
                 hideMessageRecommendations();
@@ -2824,15 +2833,9 @@
                 // Guardar mensaje
                 await saveMessageAfterAdd(question, 'sent');
 
-                // DEBUGGING: Verificar el prompt antes de enviarlo
-                const promptWithTone = getPromptWithTone(question);
-                console.log('=== PROMPT DEBUG ===');
-                console.log('Prompt with tone:', promptWithTone);
-                console.log('About to call getGeminiResponse with:', promptWithTone);
-
                 // Siempre enviar a la IA
                 setTimeout(() => {
-                    getGeminiResponse(promptWithTone);
+                    getGeminiResponse(getPromptWithTone(question));
                 }, 100);
             });
 
@@ -3120,19 +3123,8 @@
             await saveMessageAfterAdd(messageText, 'sent');
             
             // Siempre obtener respuesta de IA
-            console.log('=== MANUAL INPUT DEBUG ===');
-            console.log('Manual input messageText:', messageText);
-            console.log('Message length:', messageText.length);
-            console.log('Message includes CCL:', messageText.includes('CCL'));
-            console.log('Message includes Corporación:', messageText.includes('Corporación'));
-            
-            const promptWithTone = getPromptWithTone(messageText);
-            console.log('=== MANUAL PROMPT DEBUG ===');
-            console.log('Prompt with tone:', promptWithTone);
-            console.log('About to call getGeminiResponse with:', promptWithTone);
-            
             setTimeout(() => {
-                getGeminiResponse(promptWithTone);
+                getGeminiResponse(getPromptWithTone(messageText));
             }, 200);
         }
 
@@ -3195,11 +3187,7 @@
                 button.title = question;
                 
                 button.addEventListener('click', async () => {
-                    console.log('=== REFRESH SUGGESTION CLICK DEBUG ===');
-                    console.log('Original question from refresh suggestion:', question);
-                    console.log('Question length:', question.length);
-                    console.log('Question includes CCL:', question.includes('CCL'));
-                    console.log('Question includes Corporación:', question.includes('Corporación'));
+                    console.log('Sending refresh recommendation directly:', question);
                     
                     // Ocultar recomendaciones inmediatamente
                     hideMessageRecommendations();
@@ -3236,15 +3224,9 @@
                     // Guardar mensaje
                     await saveMessageAfterAdd(question, 'sent');
                     
-                    // DEBUGGING: Verificar el prompt antes de enviarlo
-                    const promptWithTone = getPromptWithTone(question);
-                    console.log('=== REFRESH PROMPT DEBUG ===');
-                    console.log('Prompt with tone:', promptWithTone);
-                    console.log('About to call getGeminiResponse with:', promptWithTone);
-                    
                     // Siempre enviar a la IA
                     setTimeout(() => {
-                        getGeminiResponse(promptWithTone);
+                        getGeminiResponse(getPromptWithTone(question));
                     }, 100);
                 });
                 

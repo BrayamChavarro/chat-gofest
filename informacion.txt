@@ -77,47 +77,7 @@ DÍA 3 - IMPACTA: Se diseña y presenta un "pitch" final ante un jurado para dem
 P: ¿Habrá acompañamiento durante el evento?
 R: Sí, durante todo el proceso los equipos estarán acompañados por mentores expertos. Estos mentores son consultores empresariales, docentes y empresarios que guiarán a los equipos y resolverán sus inquietudes.
 
-Evaluación y Premios
-P: ¿Quiénes evalúan las propuestas?
-R: Los jurados son personas de entidades e instituciones nacionales e internacionales que pertenecen al ecosistema de emprendimiento. Tienen el conocimiento para valorar el avance de los equipos y la posibilidad de ofrecer apoyo a las ideas que les interesen.
-
-P: ¿Cómo se evalúan los proyectos?
-R: Los criterios de evaluación y sus ponderaciones son:
-
-Coherencia con el reto: 15%
-
-Originalidad: 15%
-
-Encaje problema-solución: 20%
-
-Viabilidad de implementación: 20%
-
-Formato de la presentación: 10%
-
-Desempeño en el pitch: 20%
-
-P: ¿Qué premios o reconocimientos se entregan?
-R: Todos los participantes que cumplan con al menos el 80% de asistencia recibirán un certificado digital de participación. Los premios específicos para los equipos ganadores serán anunciados durante la instalación del evento y serán entregados por las universidades y las empresas que proponen los retos.
-
-Retos y Material de Apoyo
-P: ¿Cuáles son los retos del 3dE 2025?
-R: Los retos serán anunciados el primer día del bootcamp. Las empresas que proponen los retos son:
-
-RETO 1: CORPORACIÓN COLOMBIANA DE LOGÍSTICA
-
-RETO 2: COMESTIBLES RICOS
-
-RETO 3: SCHNEIDER ELECTRIC (DEXSON)
-
-P: ¿Se proporciona material de apoyo?
-R: Sí, se entregarán materiales y recursos para cada fase del bootcamp (Innova, Implementa, Impacta). Por ejemplo, para la fase "IMPACTA", se compartirá un video sobre "Cómo Hacer un BUEN Pitch". También se mencionan enlaces a videos sobre segmentación de clientes y bases para emprender.
-
-Aspectos Legales
-P: ¿Qué pasa con la propiedad intelectual de las ideas generadas?
-R: Las empresas que proponen los retos tendrán la posibilidad de desarrollar las ideas ganadoras y registrar la propiedad intelectual durante un período de un año después del evento. Sin embargo, siempre se respetarán los derechos morales de los creadores. Si después de un año la empresa no ha desarrollado la idea, el equipo creador tendrá el derecho de apropiarla.
-
-P: ¿Cómo se manejan los datos personales?
-R: La información personal recolectada en el registro será agregada a las bases de datos de las entidades organizadoras para informar sobre futuros eventos y oportunidades. Los participantes tienen derecho a conocer, actualizar, rectificar sus datos y solicitar su eliminación contactando a Yeisson Querubín Reyes al correo yeisson.reyes@ccb.org.co.
+ 
 
 Contexto Estratégico y Metodología Profunda
 P: ¿Por qué el 3dE es parte de Gofest? ¿Qué beneficios trae eso?
@@ -195,21 +155,7 @@ Trabajo en equipo
 
 Iniciativa
 
-¡Absolutamente! Entendido. Quieres que toda la información detallada sobre el reto de Schneider Electric se presente como una única respuesta cohesiva, en lugar de estar dividida en varias preguntas.
-
-He reestructurado el archivo informacion.txt para reflejar exactamente eso. He creado una sola pregunta exhaustiva sobre el reto de Schneider Electric (Dexson) que contiene todos los detalles de la ficha, y la he integrado en el flujo lógico del documento.
-
-Aquí tienes la versión final y definitiva. Reemplaza todo el contenido de tu archivo informacion.txt con este bloque de texto consolidado. Esta es la base de conocimiento más completa que podemos construir con los documentos proporcionados.
-
-Información General del Evento 3dE
-P: ¿Qué es el 3dE?
-R: 3dE, o "Tres días de Emprendimiento", es un bootcamp intensivo y presencial enfocado en la co-creación y la innovación. Su metodología simula el ciclo de vida temprano de una startup. Durante tres días, estudiantes de diversas universidades y disciplinas se reúnen en equipos multidisciplinarios para resolver retos reales propuestos por empresas líderes. El objetivo es generar ideas de negocio que sean viables, innovadoras y con potencial de impacto en el mercado.
-
-P: ¿Quién organiza el evento 3dE?
-R: El 3dE 2025 es coorganizado por la Cámara de Comercio de Bogotá (CCB) junto a un consorcio de 14 instituciones de educación superior: Fundación Universitaria Juan N. Corpas, Universidad Nacional de Colombia, Uniempresarial (Fundación Universitaria Empresarial de la CCB), Universidad Externado de Colombia, UNAD (Universidad Nacional Abierta y a Distancia), Universidad EAN, Uniagraria, U.D.C.A, Universidad La Gran Colombia, Fundación Universitaria Compensar, Universidad del Rosario, Universidad de la Sabana, Uniminuto y la Fundación Universitaria del Área Andina.
-
-P: ¿Qué habilidades se promueven en el 3dE?
-R: El 3dE es una experiencia diseñada para que los estudiantes movilicen y fomenten diversas habilidades clave, tales como: Capacidad de Aprender, Inteligencia Emocional, Toma de Decisiones, Ética y Valores, Solución de Problemas, Capacidad de Negociación, Creatividad e Innovación, Adaptabilidad y Flexibilidad, Trabajo en Equipo e Iniciativa.
+ 
 
 Participación y Requisitos
 P: ¿Quiénes pueden participar en el 3dE?
@@ -270,9 +216,6 @@ P: Más allá del certificado, ¿qué oportunidades reales existen para los gana
 R: Ganar no es el final, sino el inicio. Los premios son una rampa de acceso para continuar desarrollando el proyecto con respaldo institucional, incluyendo acceso a networking, ruedas de negocios, asesoría post-evento y acceso preferencial a talleres y diplomados.
 
 Retos y Contexto Estratégico
-P: ¿Cuáles son los retos del 3dE 2025?
-R: Los retos son propuestos por tres empresas líderes y se anuncian el primer día. Las empresas son: Corporación Colombiana de Logística (CCL), Comestibles Ricos y Schneider Electric (Dexson).
-
 P: ¿Puedes darme toda la información detallada sobre el reto de Schneider Electric (Dexson)?
 R: Claro, aquí está toda la información sobre el Reto de Schneider Electric - Dexson:
 
@@ -312,6 +255,33 @@ Restricciones y Condiciones Especiales: Una condición muy importante es que la 
 
 Premios y Reconocimientos: CCL ofrece a los ganadores una visita empresarial, elementos POP (material publicitario), certificado de participación, la posibilidad de ser considerados para prácticas profesionales y la oportunidad de presentar la propuesta directamente al presidente de la organización.
 
+P: ¿Puedes darme toda la información detallada sobre el reto de Comestibles Ricos?
+R: Claro, aquí está toda la información sobre el Reto de Comestibles Ricos S.A:
+
+Empresa y Marca: Comestibles Ricos S.A. es una empresa colombiana líder en la fabricación de snacks, reconocida por su tradición, calidad y cercanía con el consumidor. Avanza en la diversificación de su portafolio hacia nuevas categorías con fuerte enfoque en innovación y en responder a las tendencias del mercado. (Web: https://www.comestiblesricos.com/)
+
+Descripción Corta del Reto: Diseñar y ejecutar, en tiempo récord, un proceso innovador de testeo con consumidores reales que permita identificar: (1) qué productos (de una lista anexa) tienen mayor probabilidad de éxito; (2) qué atributos valoran más los jóvenes millennials y centennials de estratos 1–4; (3) cuál es el rango de precios ideal; (4) qué ajustes creativos podrían convertir los conceptos en ganadores. El reto culmina con un piloto cuyos resultados deben visualizarse el día de la exposición.
+
+Contexto del Problema: Los hábitos de consumo de los jóvenes cambian rápidamente: buscan productos cercanos, innovadores, accesibles y alineados a sus estilos de vida. Lanzar sin validar preferencias reales, disposición de pago y percepción de valor implica un riesgo alto. El reto busca validar rápidamente conceptos, explorar precios competitivos y definir atributos clave que aseguren éxito en el mercado juvenil.
+
+Descripción Detallada del Reto: Los equipos deben diseñar y aplicar herramientas/metodologías de validación para: (a) medir intención de compra frente a la lista de productos innovadores; (b) identificar drivers de decisión (sabores, ingredientes, empaques, beneficios, precio); (c) proponer mejoras creativas que hagan más atractivos los conceptos; (d) analizar disposición de pago en diferentes rangos de precios. La muestra de consumidores debe ser representativa, construida y testeada en tiempo récord con acompañamiento de la empresa.
+
+Beneficiarios de la Solución: (1) Consumidores jóvenes (millennials y centennials NSE 1–4): recibirán productos alineados a sus expectativas. (2) Comestibles Ricos: obtiene información confiable para minimizar riesgos de lanzamiento y priorizar portafolio. (3) Estudiantes: aplican investigación de mercados, experimentación y validación en contexto real.
+
+Alcance Esperado: (a) Reporte de resultados con insights clave; (b) identificación de productos con mayor probabilidad de éxito; (c) definición preliminar de rangos de precios aceptados; (d) recomendaciones de ajustes e ideas complementarias; (e) visualización clara del piloto el día de la exposición.
+
+Impacto Esperado: Aumentar probabilidad de éxito en lanzamientos, reducir riesgos de inversiones en conceptos de baja aceptación, conexión genuina con expectativas del consumidor joven y generación de una metodología replicable para futuros desarrollos.
+
+Restricciones: El testeo debe hacerse con consumidores reales del segmento definido; se debe mantener la confidencialidad de los conceptos compartidos.
+
+Stakeholders Clave: Equipo de I+D+i de Comestibles Ricos; consumidores jóvenes (millennials y centennials); estudiantes universitarios y docentes mentores.
+
+Perfil Sugerido de Estudiantes: Mercadeo, Administración, Economía, Ingeniería Industrial, Estadística, Diseño de Producto, Comunicación, Psicología del Consumidor. Se valoran equipos interdisciplinarios.
+
+Reconocimientos:
+Primer lugar: Visita a planta de producción, ancheta de productos, certificado de reconocimiento Comestibles Ricos, charla virtual con el Director de Innovación y socio, bono Éxito de $100.000 para cada estudiante.
+Segundo lugar: Certificado de reconocimiento y ancheta de productos.
+
 P: ¿Puedes darme la agenda detallada del primer día?
 R: La agenda para el Día 1 - INNOVA (Miércoles 27 de Agosto) es la siguiente: 8:00 a. m: Lanzamiento Gofest; 10:00 a. m: Lanzamiento 3dE; 10:15 a. m: Descripción de la dinámica; 10:30 a. m: Presentación de retos; 11:00 a. m: Formación de equipos; 12:00 p. m: Almuerzo; 1:30 p. m: Explicación de Ideación; 1:40 p. m: Trabajo en equipo; 3:00 p. m: Elevator PITCH; 4:30 p. m: Evaluación; 4:45 p. m: Cierre.
 
@@ -320,26 +290,3 @@ R: El Día 2 - IMPLEMENTA (Jueves 28 de Agosto) se enfoca en prototipado: 8:30 a
 
 P: ¿En qué consiste el último día?
 R: El Día 3 - IMPACTA (Viernes 29 de Agosto) está dedicado a la presentación: 8:30 a. m: Cápsula de PITCH; 9:00 a. m: Trabajo en equipo (PITCH); 10:00 a. m: Cápsula para mejorar el pitch con IA; 10:30 a. m: Ensayo del PITCH; 12:00 p. m: Almuerzo; 2:00 p. m: Rondas de Elevator PITCH; 4:00 p. m: PITCH Final.
-
-P: ¿Puedes darme toda la información detallada sobre el reto de Comestibles Ricos?
-R: Claro, aquí está toda la información sobre el Reto de Comestibles Ricos S.A.:
-
-Empresa y Marca: Comestibles Ricos S.A. es una empresa colombiana líder en la fabricación de snacks, reconocida por su tradición, calidad y cercanía con el consumidor. Actualmente avanza en la diversificación de su portafolio hacia nuevas categorías, con fuerte enfoque en innovación y en responder a las tendencias del mercado. Web: https://www.comestiblesricos.com/
-
-Descripción Corta del Reto: Diseñar y ejecutar, en tiempo récord, un proceso innovador de testeo con consumidores reales que permita identificar: qué productos (de una lista anexa) tienen mayor probabilidad de éxito, qué atributos valoran más los jóvenes millennials y centennials de estratos 1–4, cuál es el rango de precios ideal, y qué ajustes creativos podrían convertir los conceptos en ganadores en el mercado. El reto culmina con un piloto cuyos resultados deben visualizarse el día de la exposición.
-
-Contexto del Problema: Los hábitos de consumo de los jóvenes cambian rápidamente: buscan productos cercanos, innovadores, accesibles y alineados a sus estilos de vida. Para una empresa de alimentos, lanzar productos sin conocer las preferencias reales, disposición de pago y percepción de valor de este segmento representa un riesgo alto. El reto es una oportunidad para validar rápidamente conceptos, explorar precios competitivos y definir atributos clave que aseguren el éxito en el mercado juvenil.
-
-Descripción Detallada del Reto: Los estudiantes deberán diseñar y aplicar herramientas de validación que permitan: medir intención de compra frente a la lista de productos innovadores, identificar drivers de decisión (sabores, ingredientes, empaques, beneficios, precio), proponer mejoras creativas que hagan más atractivos los conceptos, y analizar disposición de pago en diferentes rangos de precios. La muestra de consumidores debe ser representativa, construida y probada en tiempo récord, con asesoría del equipo de la empresa.
-
-Beneficiarios de la Solución: Consumidores jóvenes (millennials y centennials, NSE 1–4) recibirán productos más alineados a sus expectativas. Comestibles Ricos contará con información confiable para minimizar riesgos de lanzamiento y aumentar el éxito de su portafolio. Los estudiantes universitarios aplicarán metodologías de investigación y validación en un caso real de mercado.
-
-Alcance Esperado: Reporte de resultados con insights clave sobre el comportamiento del consumidor, identificación de productos con mayor probabilidad de éxito, definición preliminar de rangos de precios aceptados, y recomendaciones de ajustes e ideas complementarias a los conceptos iniciales.
-
-Impacto Esperado: Mayor probabilidad de éxito en lanzamientos, reducción de riesgos al evitar desarrollos con baja aceptación, conexión real con necesidades y expectativas del consumidor joven, y desarrollo de una metodología replicable para futuros lanzamientos.
-
-Restricciones: El testeo debe realizarse con consumidores reales de los segmentos definidos y se debe mantener confidencialidad sobre los conceptos compartidos.
-
-Stakeholders: Equipo de I+D+i de Comestibles Ricos, consumidores jóvenes (millennials y centennials), estudiantes universitarios y docentes.
-
-Perfil Sugerido de Estudiantes: Mercadeo, Administración, Economía, Ingeniería Industrial, Estadística, Diseño de producto, Comunicación o Psicología del consumidor. Idealmente equipos interdisciplinarios.
