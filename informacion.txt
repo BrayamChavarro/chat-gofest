@@ -295,5 +295,51 @@ Restricciones: Las soluciones deben cumplir con las normativas eléctricas vigen
 
 Perfil Sugerido de Estudiantes: Se recomienda un equipo multidisciplinario con estudiantes de Diseño Industrial, Ingeniería Industrial, Administración de Empresas, Innovación y Desarrollo de Productos, Ingeniería Mecánica, Eléctrica, Electrónica y afines.
 
+P: ¿Puedes darme toda la información detallada sobre el reto de CCL (Corporación Colombiana de Logística)?
+R: Sí, aquí está el resumen completo del Reto de CCL:
 
+Empresa y Línea de Negocio: El reto es de CCL S.A, una empresa de logística 3PL con 5 líneas de negocio (Transporte, Acondicionamiento, Almacenamiento, Última Milla y Contenedores).
 
+Descripción Corta del Reto: El desafío es desarrollar un sistema de capacitación para mejorar las competencias del personal operativo en tareas críticas como picking (recolección de mercancías), acondicionamiento de productos y manipulación de carga con montacargas.
+
+Contexto del Problema: Actualmente, la capacitación se realiza directamente en el puesto de trabajo con un colaborador experto, lo que no permite estandarizar el conocimiento, genera sesgos y no garantiza que se cubran todos los aspectos necesarios. No hay una forma de medir el nivel de competencia del nuevo trabajador antes de que opere solo, lo que representa un riesgo para el servicio y la mercancía. Además, los colaboradores suelen tener un nivel de escolaridad de bachiller.
+
+Alcance Esperado de la Solución: Se busca un sistema de capacitación innovador, preferiblemente en una plataforma tecnológica 4.0, que sea amigable, mejore la curva de aprendizaje y reduzca los costos operativos. Debe permitir consultas rápidas para resolver dudas y mitigar los riesgos del negocio.
+
+Impacto Esperado: La solución debe mejorar la curva de aprendizaje, facilitar la adaptación al cargo y eliminar la dependencia de una única persona para el entrenamiento.
+
+Restricciones y Condiciones Especiales: Una condición muy importante es que la solución debe ser inclusiva, estando en español con subtítulos y lenguaje de señas para garantizar la accesibilidad a colaboradores con discapacidad auditiva. La empresa no cuenta actualmente con personal capacitado en lenguaje de señas.
+
+Premios y Reconocimientos: CCL ofrece a los ganadores una visita empresarial, elementos POP (material publicitario), certificado de participación, la posibilidad de ser considerados para prácticas profesionales y la oportunidad de presentar la propuesta directamente al presidente de la organización.
+
+P: ¿Puedes darme la agenda detallada del primer día?
+R: La agenda para el Día 1 - INNOVA (Miércoles 27 de Agosto) es la siguiente: 8:00 a. m: Lanzamiento Gofest; 10:00 a. m: Lanzamiento 3dE; 10:15 a. m: Descripción de la dinámica; 10:30 a. m: Presentación de retos; 11:00 a. m: Formación de equipos; 12:00 p. m: Almuerzo; 1:30 p. m: Explicación de Ideación; 1:40 p. m: Trabajo en equipo; 3:00 p. m: Elevator PITCH; 4:30 p. m: Evaluación; 4:45 p. m: Cierre.
+
+P: ¿Qué se hará durante el segundo día?
+R: El Día 2 - IMPLEMENTA (Jueves 28 de Agosto) se enfoca en prototipado: 8:30 a. m: Cápsula de prototipado; 9:00 a. m: Trabajo en equipo (Prototipo); 10:30 a. m: Cápsula de validación; 11:00 a. m: Validación del prototipo; 12:00 p. m: Almuerzo; 1:30 p. m: Ajustes al prototipo; 3:30 p. m: Elevator PITCH; 5:00 p. m: Evaluación y cierre.
+
+P: ¿En qué consiste el último día?
+R: El Día 3 - IMPACTA (Viernes 29 de Agosto) está dedicado a la presentación: 8:30 a. m: Cápsula de PITCH; 9:00 a. m: Trabajo en equipo (PITCH); 10:00 a. m: Cápsula para mejorar el pitch con IA; 10:30 a. m: Ensayo del PITCH; 12:00 p. m: Almuerzo; 2:00 p. m: Rondas de Elevator PITCH; 4:00 p. m: PITCH Final.
+
+P: ¿Puedes darme toda la información detallada sobre el reto de Comestibles Ricos?
+R: Claro, aquí está toda la información sobre el Reto de Comestibles Ricos S.A.:
+
+Empresa y Marca: Comestibles Ricos S.A. es una empresa colombiana líder en la fabricación de snacks, reconocida por su tradición, calidad y cercanía con el consumidor. Actualmente avanza en la diversificación de su portafolio hacia nuevas categorías, con fuerte enfoque en innovación y en responder a las tendencias del mercado. Web: https://www.comestiblesricos.com/
+
+Descripción Corta del Reto: Diseñar y ejecutar, en tiempo récord, un proceso innovador de testeo con consumidores reales que permita identificar: qué productos (de una lista anexa) tienen mayor probabilidad de éxito, qué atributos valoran más los jóvenes millennials y centennials de estratos 1–4, cuál es el rango de precios ideal, y qué ajustes creativos podrían convertir los conceptos en ganadores en el mercado. El reto culmina con un piloto cuyos resultados deben visualizarse el día de la exposición.
+
+Contexto del Problema: Los hábitos de consumo de los jóvenes cambian rápidamente: buscan productos cercanos, innovadores, accesibles y alineados a sus estilos de vida. Para una empresa de alimentos, lanzar productos sin conocer las preferencias reales, disposición de pago y percepción de valor de este segmento representa un riesgo alto. El reto es una oportunidad para validar rápidamente conceptos, explorar precios competitivos y definir atributos clave que aseguren el éxito en el mercado juvenil.
+
+Descripción Detallada del Reto: Los estudiantes deberán diseñar y aplicar herramientas de validación que permitan: medir intención de compra frente a la lista de productos innovadores, identificar drivers de decisión (sabores, ingredientes, empaques, beneficios, precio), proponer mejoras creativas que hagan más atractivos los conceptos, y analizar disposición de pago en diferentes rangos de precios. La muestra de consumidores debe ser representativa, construida y probada en tiempo récord, con asesoría del equipo de la empresa.
+
+Beneficiarios de la Solución: Consumidores jóvenes (millennials y centennials, NSE 1–4) recibirán productos más alineados a sus expectativas. Comestibles Ricos contará con información confiable para minimizar riesgos de lanzamiento y aumentar el éxito de su portafolio. Los estudiantes universitarios aplicarán metodologías de investigación y validación en un caso real de mercado.
+
+Alcance Esperado: Reporte de resultados con insights clave sobre el comportamiento del consumidor, identificación de productos con mayor probabilidad de éxito, definición preliminar de rangos de precios aceptados, y recomendaciones de ajustes e ideas complementarias a los conceptos iniciales.
+
+Impacto Esperado: Mayor probabilidad de éxito en lanzamientos, reducción de riesgos al evitar desarrollos con baja aceptación, conexión real con necesidades y expectativas del consumidor joven, y desarrollo de una metodología replicable para futuros lanzamientos.
+
+Restricciones: El testeo debe realizarse con consumidores reales de los segmentos definidos y se debe mantener confidencialidad sobre los conceptos compartidos.
+
+Stakeholders: Equipo de I+D+i de Comestibles Ricos, consumidores jóvenes (millennials y centennials), estudiantes universitarios y docentes.
+
+Perfil Sugerido de Estudiantes: Mercadeo, Administración, Economía, Ingeniería Industrial, Estadística, Diseño de producto, Comunicación o Psicología del consumidor. Idealmente equipos interdisciplinarios.

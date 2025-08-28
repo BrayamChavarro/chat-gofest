@@ -2632,6 +2632,58 @@
         container.scrollTop = container.scrollHeight;
     };
 
+    // Debug function para testing
+    window.testCCLQuestion = async function() {
+        console.log("=== TESTING CCL QUESTION ===");
+        
+        if (!window.ragQuery) {
+            console.error("RAG no está disponible");
+            return;
+        }
+        
+        const testQuery = "¿Puedes darme toda la información detallada sobre el reto de CCL?";
+        console.log("Testing query:", testQuery);
+        
+        try {
+            const augmentedPrompt = await window.ragQuery(testQuery);
+            console.log("Augmented prompt generated:", augmentedPrompt.substring(0, 500) + "...");
+            
+            // Test specific content search
+            const chunks = window.documentChunks || [];
+            console.log("Total chunks available:", chunks.length);
+            
+            const cclChunks = chunks.filter(chunk => 
+                chunk.toLowerCase().includes('ccl') || 
+                chunk.toLowerCase().includes('corporación colombiana de logística')
+            );
+            console.log("CCL-related chunks found:", cclChunks.length);
+            
+            cclChunks.forEach((chunk, i) => {
+                console.log(`CCL Chunk ${i + 1}:`, chunk.substring(0, 200) + "...");
+            });
+            
+        } catch (error) {
+            console.error("Error testing CCL question:", error);
+        }
+    };
+
+    // Debug function to test RAG initialization
+    window.debugRAG = function() {
+        console.log("=== RAG DEBUG INFO ===");
+        console.log("RAG Ready:", isRagReady);
+        console.log("RAG functions available:");
+        console.log("- ragQuery:", typeof window.ragQuery);
+        console.log("- getMessageRecommendations:", typeof window.getMessageRecommendations);
+        console.log("- initializeRAG:", typeof window.initializeRAG);
+        
+        if (window.documentChunks) {
+            console.log("Document chunks:", window.documentChunks.length);
+        }
+        if (window.availableQuestions) {
+            console.log("Available questions:", window.availableQuestions.length);
+        }
+    };
+
     const getGeminiResponse = async (prompt) => {
         console.log('Obteniendo respuesta de Gemini para:', prompt);
         
@@ -2655,10 +2707,10 @@
 
             const apiKey = window.GEMINI_CONFIG?.apiKey;
             const baseUrl = window.GEMINI_CONFIG?.baseUrl;
-        const apiUrl = `${baseUrl}?key=${apiKey}`;
-        const payload = {
+            const apiUrl = `${baseUrl}?key=${apiKey}`;
+            const payload = {
                 contents: [{ parts: [{ text: augmentedPrompt }] }] // Usamos el prompt aumentado
-        };
+            };
 
             const response = await fetch(apiUrl, {
                 method: 'POST',

@@ -152,11 +152,31 @@ function findRelevantChunks(query, chunks, maxChunks = 4) {
     const chunkScores = [];
     
     // Palabras clave importantes para dar más peso
-    const importantWords = ['organiza', 'organizador', 'universidades', 'instituciones', '3de', 'evento', 'cámara', 'comercio'];
+    const importantWords = ['organiza', 'organizador', 'universidades', 'instituciones', '3de', 'evento', 'cámara', 'comercio', 'ccl', 'corporación', 'logística', 'schneider', 'comestibles', 'ricos'];
     
+    // Detectar consultas específicas sobre retos
+    const isCCLQuery = queryLower.includes('ccl') || queryLower.includes('corporación colombiana') || 
+                      (queryLower.includes('reto') && queryLower.includes('logística'));
+    const isSchneiderQuery = queryLower.includes('schneider') || queryLower.includes('dexson') ||
+                            (queryLower.includes('reto') && queryLower.includes('electric'));
+    const isComestiblesQuery = queryLower.includes('comestibles') || queryLower.includes('ricos') ||
+                              (queryLower.includes('reto') && queryLower.includes('comestibles'));
+
     chunks.forEach((chunk, index) => {
         const chunkLower = chunk.toLowerCase();
         let score = 0;
+        
+        // Bonus específico para queries de retos
+        if (isCCLQuery && (chunkLower.includes('ccl') || chunkLower.includes('corporación colombiana de logística'))) {
+            score += 50;
+            console.log(`[FIND_CHUNKS] CCL match bonus aplicado al chunk ${index}: +50`);
+        }
+        if (isSchneiderQuery && (chunkLower.includes('schneider') || chunkLower.includes('dexson'))) {
+            score += 50;
+        }
+        if (isComestiblesQuery && chunkLower.includes('comestibles')) {
+            score += 50;
+        }
         
         // Bonus por contener pregunta similar
         if (chunkLower.includes('p:') && chunkLower.includes('organiza')) {
@@ -186,6 +206,11 @@ function findRelevantChunks(query, chunks, maxChunks = 4) {
             score += 5;
         }
         
+        // Bonus adicional para chunks que mencionan retos específicos
+        if (chunkLower.includes('información detallada sobre el reto')) {
+            score += 20;
+        }
+        
         chunkScores.push({ chunk, score, index });
     });
     
@@ -194,9 +219,10 @@ function findRelevantChunks(query, chunks, maxChunks = 4) {
         .sort((a, b) => b.score - a.score)
         .slice(0, maxChunks);
     
-    console.log('Chunks encontrados con scores:', sortedChunks.map(item => ({
+    console.log('[FIND_CHUNKS] Chunks encontrados con scores:', sortedChunks.map(item => ({
+        index: item.index,
         score: item.score,
-        preview: item.chunk.substring(0, 100) + '...'
+        preview: item.chunk.substring(0, 100).replace(/\n/g, ' ') + '...'
     })));
     
     return sortedChunks.map(item => item.chunk);
@@ -248,18 +274,37 @@ window.initializeRAG = async function(apiKey) {
  */
 window.ragQuery = async function(query) {
   if (!documentChunks || documentChunks.length === 0) {
+    console.error("RAGQUERY ERROR: El sistema RAG no ha sido inicializado.");
     throw new Error("El sistema RAG no ha sido inicializado.");
   }
 
-  console.log(`Buscando información relevante para: "${query}"`);
+  console.log(`[RAGQUERY] Buscando información relevante para: "${query}"`);
+  console.log(`[RAGQUERY] Total chunks disponibles: ${documentChunks.length}`);
 
   // Buscar chunks relevantes usando búsqueda por palabras clave
   const relevantChunks = findRelevantChunks(query, documentChunks, 3);
-  console.log(`Encontrados ${relevantChunks.length} fragmentos relevantes.`);
+  console.log(`[RAGQUERY] Encontrados ${relevantChunks.length} fragmentos relevantes.`);
+
+  // Debug específico para CCL
+  if (query.toLowerCase().includes('ccl') || query.toLowerCase().includes('corporación colombiana')) {
+    console.log("[RAGQUERY] CCL Query detectada, información específica:");
+    
+    const cclChunks = documentChunks.filter(chunk => 
+      chunk.toLowerCase().includes('ccl') || 
+      chunk.toLowerCase().includes('corporación colombiana de logística')
+    );
+    console.log(`[RAGQUERY] Chunks que contienen CCL: ${cclChunks.length}`);
+    
+    cclChunks.forEach((chunk, i) => {
+      console.log(`[RAGQUERY] CCL Chunk ${i + 1} (${chunk.length} chars):`, 
+        chunk.substring(0, 100).replace(/\n/g, ' ') + '...');
+    });
+  }
 
   // Debug: mostrar el contenido de los chunks encontrados
   relevantChunks.forEach((chunk, i) => {
-    console.log(`Chunk relevante ${i + 1}:`, chunk.substring(0, 200) + '...');
+    console.log(`[RAGQUERY] Chunk relevante ${i + 1} (score-based):`, 
+      chunk.substring(0, 150).replace(/\n/g, ' ') + '...');
   });
 
   // Construir el contexto y el prompt para Gemini
@@ -285,9 +330,10 @@ window.ragQuery = async function(query) {
     .replace("{context}", context)
     .replace("{query}", query);
 
-  console.log("--- PROMPT AUMENTADO CREADO ---");
-  console.log("Contexto incluido:", context.substring(0, 300) + "...");
-  console.log("Longitud total del contexto:", context.length, "caracteres");
+  console.log("[RAGQUERY] --- PROMPT AUMENTADO CREADO ---");
+  console.log("[RAGQUERY] Contexto incluido:", context.substring(0, 300).replace(/\n/g, ' ') + "...");
+  console.log("[RAGQUERY] Longitud total del contexto:", context.length, "caracteres");
+  
   return finalPrompt;
 }
 
@@ -316,9 +362,17 @@ window.getMessageRecommendations = function(category = null, count = 4) {
             '¿Quiénes pueden participar en el 3dE?',
             '¿Cuáles son los requisitos para participar?',
             '¿Cómo es la dinámica del 3dE?',
-            '¿Hay algún costo para participar?',
+            '¿Tiene algún costo participar?',
+            '¿Cómo me puedo inscribir?',
             '¿Cuáles son los retos del 3dE 2025?',
-            '¿Puedes darme toda la información detallada sobre el reto de Schneider Electric (Dexson)?'
+            '¿Puedes darme toda la información detallada sobre el reto de Schneider Electric (Dexson)?',
+            '¿Puedes darme toda la información detallada sobre el reto de CCL (Corporación Colombiana de Logística)?',
+            '¿Puedes darme toda la información detallada sobre el reto de Comestibles Ricos?',
+            '¿Qué habilidades se promueven en el 3dE?',
+            '¿Qué son las "cápsulas" que mencionan en la agenda?',
+            '¿Puedes darme la agenda detallada del primer día?',
+            '¿Qué se hará durante el segundo día?',
+            '¿En qué consiste el último día?'
         ];
         
         // Combinar preguntas populares con algunas aleatorias
